@@ -6,11 +6,11 @@ Bu proje, bir kurumun ürün envanterini ve stok hareketlerini takip etmesini sa
 
 ## 🔧 Kullanılan Teknolojiler
 
-- 🧠 ASP.NET Core Web API (Backend)
-- 🗃️ MS SQL Server (Veritabanı)
-- ⚛️ React + Vite (Frontend)
-- 🎨 Material UI (Tasarım bileşenleri)
-- 🔗 Axios (Frontend–Backend HTTP bağlantısı)
+- 🧠 **ASP.NET Core Web API** (Backend)
+- 🗃️ **MS SQL Server** (Veritabanı)
+- ⚛️ **React + Vite** (Frontend)
+- 🎨 **Material UI** (Tasarım bileşenleri)
+- 🔗 **Axios** (Frontend–Backend HTTP bağlantısı)
 
 ---
 
@@ -18,8 +18,8 @@ Bu proje, bir kurumun ürün envanterini ve stok hareketlerini takip etmesini sa
 
 ```
 inventory-stock-system/
-├── envanter-frontend/     # React uygulaması
-├── inventoryapi/          # .NET Core Web API
+├── envanter-frontend/     # React uygulaması (Frontend)
+├── InventoryApi/          # ASP.NET Core Web API (Backend)
 ├── .gitignore             # Gereksiz dosyaları hariç tutar
 └── README.md              # Proje tanıtım dosyası
 ```
@@ -30,15 +30,15 @@ inventory-stock-system/
 
 ### 🔷 Backend (API) çalıştırmak için:
 ```bash
-cd inventoryapi
-dotnet run
+cd InventoryApi
+dotnet run  # API http://localhost:5184 üzerinden çalışır
 ```
 
 ### 🔷 Frontend (React) çalıştırmak için:
 ```bash
 cd envanter-frontend
-npm install
-npm run dev
+npm install  # Gerekli paketleri yükler
+npm run dev  # Uygulamayı http://localhost:5173 adresinde başlatır
 ```
 
 ---
@@ -60,9 +60,15 @@ npm run dev
 **Hamza Taşbay**  
 📧 E-posta: `T_4517-Hamza-4518@outlook.com`  
 📍 Lokasyon: İstanbul / Beykoz  
-🔗 [LinkedIn](https://www.linkedin.com/in/hamza-taşbay-3b7b94304/)  
-🔗 [GitHub](https://github.com/HmzT270)
+🔗 https://www.linkedin.com/in/hamza-taşbay-3b7b94304/  
+🔗 https://github.com/HmzT270
 
 ---
 
 > 💡 Bu proje, yazılım geliştirme stajı sürecinde full-stack bir uygulama olarak geliştirilmiştir. Hem backend hem frontend yapıları bir arada barındırır.
+---
+
+> ⚠️ Not: Proje geliştirme sürecinde sadece HTTP (`http://localhost:5184`) kullanılmıştır. 
+> HTTPS yönlendirme `Program.cs` üzerinden kaldırılmıştır. 
+> Yayına alınması durumunda HTTPS desteği kolayca tekrar eklenebilir.
+

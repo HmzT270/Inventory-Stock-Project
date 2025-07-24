@@ -1,33 +1,36 @@
 # LOG VE GEÇİCİ DOSYALAR
-*.log                    # Uygulama log dosyaları
-logs/                    # Log klasörü
-*.tmp                    # Geçici dosyalar
-*.bak                    # Yedek dosyalar
-*.swp                    # Editör geçici dosyaları (Vim, VS Code)
-*.db                     # Geçici veritabanı dosyaları
+*.log
+logs/
+*.tmp
+*.bak*
+*.swp
+*.db
 
 # FRONTEND (React, Vite, Node)
-node_modules/            # Node bağımlılıkları (npm install ile yeniden kurulur)
-dist/                    # Üretim çıktısı
-dist-ssr/                # Server-side render çıktısı
-.vite/                   # Vite önbellek klasörü
-.env                     # Ortam değişkenleri (gizli anahtarlar içerir)
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.env
+.env.*
+.env.*.local
 
 # BACKEND (.NET Core)
-bin/                     # Derleme çıktısı
-obj/                     # Derleme önbelleği
-.vs/                     # Visual Studio klasörü
-appsettings.*.json       # Ortam yapılandırmaları (şifre içerebilir)
-*.suo                    # VS kullanıcı ayar dosyası
-*.user                   # VS kullanıcı ayar dosyası
+bin/
+obj/
+.vs/
+appsettings.json
+appsettings.*.json
+*.suo
+*.user
 
 # EDITÖR VE SİSTEM DOSYALARI
-.vscode/                 # VS Code proje ayarları
-!.vscode/extensions.json # Belirli uzantı listesi dahil olabilir
-.idea/                   # JetBrains (WebStorm/Rider) ayar klasörü
-.DS_Store                # macOS sistem dosyası
-Thumbs.db                # Windows sistem önizleme dosyası
-desktop.ini              # Windows sistem konfigürasyon dosyası
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
 
 # ARŞİV DOSYALARI
 *.zip

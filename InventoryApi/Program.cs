@@ -41,7 +41,8 @@ if (app.Environment.IsDevelopment())
 // CORS middleware — 🔽 burayı EKLEDİK
 app.UseCors("AllowReactApp");
 
-app.UseHttpsRedirection();
+// 🔽 HTTPS yönlendirme kaldırıldı
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

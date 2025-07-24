@@ -339,3 +339,4 @@ C:\Users\ByHmzT\Desktop\inventory-stock-system\InventoryApi\obj\Debug\net8.0\ref
 C:\Users\ByHmzT\Desktop\inventory-stock-system\InventoryApi\obj\Debug\net8.0\InventoryApi.pdb
 C:\Users\ByHmzT\Desktop\inventory-stock-system\InventoryApi\obj\Debug\net8.0\InventoryApi.genruntimeconfig.cache
 C:\Users\ByHmzT\Desktop\inventory-stock-system\InventoryApi\obj\Debug\net8.0\ref\InventoryApi.dll
+C:\Users\ByHmzT\Desktop\inventory-stock-system\InventoryApi\obj\Debug\net8.0\InventoryApi.sourcelink.json
