@@ -1,0 +1,38 @@
+# LOG VE GEÇİCİ DOSYALAR
+*.log
+logs/
+*.tmp
+*.bak*
+*.swp
+*.db
+
+# FRONTEND (React, Vite, Node)
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.env
+.env.*
+.env.*.local
+
+# BACKEND (.NET Core)
+**/bin/
+**/obj/
+.vs/
+appsettings.json
+appsettings.*.json
+*.suo
+*.user
+
+# EDITÖR VE SİSTEM DOSYALARI
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ARŞİV DOSYALARI
+*.zip
+*.rar
+*.7z

@@ -1,0 +1,83 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424; /* Yedek renk */
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  /* Aşağıdaki satır gradient’i tüm sayfaya uygular ve sabitler */
+  background: linear-gradient(
+    120deg,
+    #2341e7 0%,
+    #4dd1cf 40%,
+    #8947ca 80%,
+    #0d0f0f 100%
+  ) no-repeat fixed;
+  background-size: cover;
+}
+
+body {
+  min-width: 320px;
+  overflow-x: hidden; /* Yatay scroll’u engelle */
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* DataGrid’in scroll barı her zaman gözüksün diye ekle */
+.MuiDataGrid-virtualScroller {
+  overflow-y: scroll !important;
+  scrollbar-width: thin;
+}
+
+/* Light mode ayarları */
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+}
