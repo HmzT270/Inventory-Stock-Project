@@ -23,6 +23,7 @@ appsettings.json
 appsettings.*.json
 *.suo
 *.user
+*.http
 
 # EDITÖR VE SİSTEM DOSYALARI
 .vscode/
