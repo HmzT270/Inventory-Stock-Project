@@ -23,6 +23,7 @@ dist-ssr/
 appsettings.Development.json
 appsettings.Production.json
 Properties/launchSettings.json
+InventoryApi/Properties/
 *.suo
 *.user
 *.http
