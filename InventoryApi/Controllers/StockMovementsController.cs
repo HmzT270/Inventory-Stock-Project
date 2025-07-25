@@ -16,7 +16,7 @@ namespace InventoryApi.Controllers
             _context = context;
         }
 
-        // ✅ Tüm stok hareketlerini getir
+        // Tüm stok hareketlerini getir
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StockMovement>>> GetStockMovements()
         {
@@ -25,7 +25,7 @@ namespace InventoryApi.Controllers
                 .ToListAsync();
         }
 
-        // ✅ Belirli bir stok hareketini getir
+        // Belirli bir stok hareketini getir
         [HttpGet("{id}")]
         public async Task<ActionResult<StockMovement>> GetStockMovement(int id)
         {
@@ -36,7 +36,7 @@ namespace InventoryApi.Controllers
             return movement;
         }
 
-        // ✅ Yeni stok hareketi ekle
+        // Yeni stok hareketi ekle
         [HttpPost]
         public async Task<ActionResult<StockMovement>> Create(StockMovement movement)
         {
@@ -57,7 +57,7 @@ namespace InventoryApi.Controllers
             return CreatedAtAction(nameof(GetStockMovement), new { id = movement.MovementId }, movement);
         }
 
-        // ✅ Stok hareketini sil
+        // Stok hareketini sil
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -71,7 +71,7 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        // ✅ Belirli ürüne ait tüm stok hareketlerini getir
+        // Belirli ürüne ait tüm stok hareketlerini getir
         [HttpGet("Product/{productId:int}")]
         public async Task<ActionResult<IEnumerable<StockMovement>>> GetMovementsByProduct(int productId)
         {

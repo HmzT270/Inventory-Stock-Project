@@ -6,13 +6,12 @@ const theme = createTheme({
   breakpoints: {
     values: {
       xs: 0,      // Mobil
-      sm: 768,    // Tablet başlar
+      sm: 768,    // Tablet
       md: 1158,   // Bilgisayar başlar
-      lg: 1400,   // (istersen artırılabilir)
-      xl: 1800,   // (istersen artırılabilir)
+      lg: 1400,
+      xl: 1800,
     },
   },
-  // Diğer özelleştirmeler buraya eklenebilir (renkler, tipografi vs.)
 });
 
 export default theme;

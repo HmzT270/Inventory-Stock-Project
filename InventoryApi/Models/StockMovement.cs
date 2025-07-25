@@ -13,7 +13,7 @@ namespace InventoryApi.Models
 
         [Required]
         [RegularExpression("^(in|out)$", ErrorMessage = "MovementType sadece 'in' veya 'out' olabilir")]
-        public string MovementType { get; set; } = string.Empty; // CS8618 çözümü
+        public string MovementType { get; set; } = string.Empty;
 
         [Range(1, int.MaxValue, ErrorMessage = "Hareket miktarı en az 1 olmalı")]
         public int Quantity { get; set; }
@@ -21,6 +21,6 @@ namespace InventoryApi.Models
         public DateTime MovementDate { get; set; }
 
         [ValidateNever]
-        public Product Product { get; set; } = null!; // EF sonradan set edecek
+        public Product Product { get; set; } = null!;
     }
 }

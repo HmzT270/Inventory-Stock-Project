@@ -20,7 +20,7 @@ export const deleteProduct = async (id) => {
   }
 };
 
-// ✅ Kategoriye göre ürünleri getir
+// Kategoriye göre ürünleri getir
 export const getProductsByCategory = async (categoryId) => {
   try {
     const response = await axios.get(`${API_URL}/ByCategory/${categoryId}`);
@@ -31,7 +31,7 @@ export const getProductsByCategory = async (categoryId) => {
   }
 };
 
-// ✅ Ürün açıklamasını güncelle
+// Ürün açıklamasını güncelle
 export const updateProductDescription = async (productId, newDescription) => {
   try {
     await axios.put(`${API_URL}/${productId}/UpdateDescription`, {
@@ -43,7 +43,7 @@ export const updateProductDescription = async (productId, newDescription) => {
   }
 };
 
-// ✅ Son 10 silinen ürünü getir (dashboard ve silinen ürünler sayfası için ortak)
+// Son 10 silinen ürünü getir
 export const getLast10Deleted = async () => {
   try {
     const response = await axios.get(`${API_URL}/Last10Deleted`);
@@ -54,7 +54,7 @@ export const getLast10Deleted = async () => {
   }
 };
 
-// ✅ Ürün kategorisini değiştir
+// Ürün kategorisini değiştir
 export const updateProductCategory = async (productId, newCategoryId) => {
   try {
     await axios.put(`${API_URL}/${productId}/ChangeCategory`, {

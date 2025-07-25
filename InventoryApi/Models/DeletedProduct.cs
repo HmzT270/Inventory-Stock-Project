@@ -6,7 +6,7 @@ namespace InventoryApi.Models
     {
         public int DeletedProductId { get; set; }
 
-        public string Name { get; set; } = string.Empty; // Null hatası önlendi
+        public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 
@@ -16,6 +16,6 @@ namespace InventoryApi.Models
 
         public int? OriginalProductId { get; set; }
 
-        public string? CategoryName { get; set; }  // Opsiyonel alan
+        public string? CategoryName { get; set; }
     }
 }

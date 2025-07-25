@@ -45,7 +45,7 @@ namespace InventoryApi.Controllers
             return CreatedAtAction(nameof(GetCategory), new { id = category.CategoryId }, category);
         }
 
-        // Kategori güncelle (tamamı)
+        // Kategori güncelle
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategory(int id, [FromBody] Category category)
         {
@@ -58,7 +58,7 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        // Kategori adı değiştir (sadece ad)
+        // Kategori adı değiştir
         public class RenameCategoryDto
         {
             public string NewName { get; set; } = string.Empty;
