@@ -5,6 +5,7 @@ logs/
 *.bak*
 *.swp
 *.db
+!*.sql
 
 # FRONTEND (React, Vite, Node)
 node_modules/
