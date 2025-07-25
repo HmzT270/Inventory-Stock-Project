@@ -20,8 +20,9 @@ dist-ssr/
 **/bin/
 **/obj/
 .vs/
-appsettings.json
-appsettings.*.json
+appsettings.Development.json
+appsettings.Production.json
+Properties/launchSettings.json
 *.suo
 *.user
 *.http
