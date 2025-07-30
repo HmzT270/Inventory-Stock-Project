@@ -43,6 +43,43 @@ npm run dev  # Uygulamayı http://localhost:5173 adresinde başlatır
 
 ---
 
+## 🛠️ Veritabanı Kurulumu
+
+Bu projede fiziksel bir SQL dosyası (`.sql`, `.bak`, `.mdf`) paylaşılmamaktadır.  
+Veritabanı yapısı, Entity Framework Core kullanılarak **backend projesi içerisindeki `Migrations/` klasöründe** saklanır.
+
+Başka bir kullanıcı bu projeyi kendi bilgisayarına indirip aşağıdaki adımlarla veritabanını sıfırdan oluşturabilir:
+
+### 🧩 Gereksinimler
+
+- Microsoft SQL Server (örn: SQL Server Express 2019+)
+- .NET SDK (7.0+)
+- Visual Studio veya Visual Studio Code
+- EF Core CLI (`dotnet ef`)
+
+### 🧪 Adımlar
+
+1. **Proje dizinine girin:**
+```bash
+cd inventory-stock-system/InventoryApi
+```
+
+2. **appsettings.json içindeki bağlantı cümlesini kendi bilgisayarınıza göre düzenleyin:**
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost\SQLEXPRESS;Database=Deneme;Trusted_Connection=True;"
+}
+```
+
+3. **Aşağıdaki komutla veritabanını oluşturun:**
+```bash
+dotnet ef database update
+```
+
+> Bu işlem, veritabanını `Migrations/` klasöründeki tanımlara göre sıfırdan oluşturur.
+
+---
+
 ## 📝 Temel Özellikler
 
 - ✅ Ürün ekleme, silme, güncelleme ve listeleme
@@ -66,9 +103,9 @@ npm run dev  # Uygulamayı http://localhost:5173 adresinde başlatır
 ---
 
 > 💡 Bu proje, yazılım geliştirme stajı sürecinde full-stack bir uygulama olarak geliştirilmiştir. Hem backend hem frontend yapıları bir arada barındırır.
+
 ---
 
 > ⚠️ Not: Proje geliştirme sürecinde sadece HTTP (`http://localhost:5184`) kullanılmıştır. 
 > HTTPS yönlendirme `Program.cs` üzerinden kaldırılmıştır. 
 > Yayına alınması durumunda HTTPS desteği kolayca tekrar eklenebilir.
-

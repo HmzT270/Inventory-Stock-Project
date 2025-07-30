@@ -9,6 +9,8 @@ import {
   Box,
   useMediaQuery,
   useTheme,
+  Typography,
+  Button,
 } from "@mui/material";
 import {
   Home,
@@ -18,32 +20,32 @@ import {
   Edit,
   DeleteOutline,
   Menu as MenuIcon,
-  Info,
   Category,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import BrandingWatermarkIcon from "@mui/icons-material/BrandingWatermark";
 
 const DRAWER_WIDTH = 260;
 
-export default function Sidebar({ children }) {
+export default function Sidebar({ children, role, username, onLogout }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
-
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const menuItems = [
-    { to: "/", icon: <Home />, label: "Ana Sayfa" },
-    { to: "/products", icon: <Inventory />, label: "Ürünler" },
-    {
-      to: "/deleted-products",
-      icon: <DeleteOutline />,
-      label: "Silinen Ürünler",
-    },
-    { to: "/product-management", icon: <AddBox />, label: "Ürün Ekle/Sil" },
-    { to: "/rename-product", icon: <Edit />, label: "Ürün Düzenle" },
-    { to: "/kategori-duzenle", icon: <Category />, label: "Kategori Düzenle" },
-    { to: "/stock", icon: <Layers />, label: "Stok Yönetimi" },
+    { to: "/", icon: <Home />, label: "Ana Sayfa", always: true },
+    { to: "/products", icon: <Inventory />, label: "Ürünler", always: true },
+    { to: "/deleted-products", icon: <DeleteOutline />, label: "Silinen Ürünler", admin: true },
+    { to: "/product-management", icon: <AddBox />, label: "Ürün Ekle/Sil", admin: true },
+    { to: "/rename-product", icon: <Edit />, label: "Ürün Düzenle", admin: true },
+    { to: "/kategori-duzenle", icon: <Category />, label: "Kategori Düzenle", admin: true },
+    { to: "/marka-duzenle", icon: <BrandingWatermarkIcon />, label: "Marka Düzenle", admin: true },
+    { to: "/stock", icon: <Layers />, label: "Stok Yönetimi", admin: true },
   ];
+
+  const visibleMenu = menuItems.filter(
+    (item) => item.always || (item.admin && role === "admin")
+  );
 
   const hamburgerIconButtonSx = {
     color: "#fff",
@@ -63,6 +65,8 @@ export default function Sidebar({ children }) {
         height: "100%",
         color: "#fff",
         overflowX: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
       role="presentation"
       onClick={isMobile ? () => setDrawerOpen(false) : undefined}
@@ -97,7 +101,7 @@ export default function Sidebar({ children }) {
           )}
         </ListItem>
 
-        {menuItems.map(({ to, icon, label }) => (
+        {visibleMenu.map(({ to, icon, label }) => (
           <ListItem
             component={Link}
             to={to}
@@ -133,6 +137,29 @@ export default function Sidebar({ children }) {
           </ListItem>
         ))}
       </List>
+      <Box sx={{ flex: 1 }} />
+      <Box sx={{ p: 2, pb: 3 }}>
+        <Typography sx={{ color: "#b6e6fa", fontWeight: 600, mb: 1 }}>
+          {username ? `Giriş yapan: ${username}` : ""}
+        </Typography>
+        <Button
+          onClick={onLogout}
+          variant="outlined"
+          color="inherit"
+          sx={{
+            color: "#fff",
+            borderColor: "#b6e6fa",
+            "&:hover": {
+              backgroundColor: "#234872",
+              borderColor: "#b6e6fa",
+            },
+            fontWeight: 600,
+            width: "100%",
+          }}
+        >
+          Çıkış Yap
+        </Button>
+      </Box>
     </Box>
   );
 

@@ -15,6 +15,8 @@ function ProductManagement() {
   const [productName, setProductName] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [brands, setBrands] = useState([]);
+  const [selectedBrand, setSelectedBrand] = useState(null);
   const [quantity, setQuantity] = useState(0);
   const [description, setDescription] = useState("");
   const [products, setProducts] = useState([]);
@@ -33,6 +35,10 @@ function ProductManagement() {
     fetch("http://localhost:5184/api/Category")
       .then((res) => res.json())
       .then((data) => setCategories(data));
+
+    fetch("http://localhost:5184/api/Brand")
+      .then((res) => res.json())
+      .then((data) => setBrands(data));
 
     fetch("http://localhost:5184/api/Product")
       .then((res) => res.json())
@@ -54,10 +60,10 @@ function ProductManagement() {
   };
 
   const handleAdd = async () => {
-    if (!productName.trim() || !selectedCategory) {
+    if (!productName.trim() || !selectedCategory || !selectedBrand) {
       showTemporaryMessage(setStatusAdd, setShowAddStatus, {
         success: false,
-        message: "Ürün adı ve kategori seçmelisiniz.",
+        message: "Ürün adı, kategori ve marka seçilmelidir.",
       });
       return;
     }
@@ -69,6 +75,7 @@ function ProductManagement() {
           name: productName,
           quantity: quantity,
           categoryId: selectedCategory.categoryId,
+          brandId: selectedBrand.brandId,
           description: description.trim() === "" ? null : description,
         }),
       });
@@ -76,6 +83,7 @@ function ProductManagement() {
         setProductName("");
         setQuantity(0);
         setSelectedCategory(null);
+        setSelectedBrand(null);
         setDescription("");
         showTemporaryMessage(setStatusAdd, setShowAddStatus, {
           success: true,
@@ -154,7 +162,7 @@ function ProductManagement() {
           <Paper
             sx={{
               width: 360,
-              height: 395,
+              height: 460,
               p: 3,
               bgcolor: "rgba(68, 129, 160, 0)",
               color: "#ffffff",
@@ -187,7 +195,29 @@ function ProductManagement() {
                   {...params}
                   label="Kategori"
                   fullWidth
-                  sx={{ mb: 3 }}
+                  sx={{ mb: 2.5 }}
+                  InputLabelProps={{ sx: labelSx }}
+                  InputProps={{
+                    ...params.InputProps,
+                    style: { color: "#ffffff" },
+                  }}
+                />
+              )}
+            />
+            <Autocomplete
+              options={brands}
+              getOptionLabel={(option) => option.name}
+              value={selectedBrand}
+              onChange={(e, val) => setSelectedBrand(val)}
+              componentsProps={{
+                paper: { sx: { bgcolor: "#5992cbff", color: "#ffffff" } },
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Marka"
+                  fullWidth
+                  sx={{ mb: 2.5 }}
                   InputLabelProps={{ sx: labelSx }}
                   InputProps={{
                     ...params.InputProps,

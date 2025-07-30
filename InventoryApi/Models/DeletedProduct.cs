@@ -17,5 +17,7 @@ namespace InventoryApi.Models
         public int? OriginalProductId { get; set; }
 
         public string? CategoryName { get; set; }
+
+        public string? Brand { get; set; } // ✅ Marka bilgisi eklendi
     }
 }

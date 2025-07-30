@@ -10,7 +10,9 @@ import {
   TableRow,
   Paper,
   Grid,
+  Button,
 } from "@mui/material";
+import { v4 as uuidv4 } from "uuid";
 
 export default function DeletedProductsTable() {
   const [deletedProducts, setDeletedProducts] = useState([]);
@@ -20,6 +22,26 @@ export default function DeletedProductsTable() {
       .then((res) => res.json())
       .then((data) => setDeletedProducts(Array.isArray(data) ? data : []));
   }, []);
+
+  const restoreProduct = async (originalProductId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5184/api/Product/Restore/${originalProductId}`,
+        { method: "POST" }
+      );
+      if (response.ok) {
+        setDeletedProducts((prev) =>
+          prev.filter((p) => p.originalProductId !== originalProductId)
+        );
+        alert("Ürün başarıyla geri yüklendi.");
+      } else {
+        alert("Geri yükleme başarısız.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Bir hata oluştu.");
+    }
+  };
 
   return (
     <Box
@@ -35,7 +57,7 @@ export default function DeletedProductsTable() {
       <Box
         sx={{
           width: "100%",
-          maxWidth: 1000,
+          maxWidth: 1200,
           mx: "auto",
           px: { xs: 1, md: 2 },
         }}
@@ -67,28 +89,28 @@ export default function DeletedProductsTable() {
                     <TableCell sx={cellHeaderStyle()}>Adı</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Stok</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Kategori</TableCell>
+                    <TableCell sx={cellHeaderStyle()}>Marka</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Ürün ID</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Açıklama</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Silinme Tarihi</TableCell>
+                    <TableCell sx={cellHeaderStyle()} align="center">
+                      İşlem
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {deletedProducts.map((p, index) => (
-                    <TableRow
-                      key={
-                        p.deletedProductId ||
-                        p.originalProductId ||
-                        p.productId ||
-                        index
-                      }
-                    >
+                  {deletedProducts.map((p) => (
+                    <TableRow key={uuidv4()}>
                       <TableCell sx={cellBodyStyle()}>{p.name}</TableCell>
                       <TableCell sx={cellBodyStyle()}>{p.quantity}</TableCell>
                       <TableCell sx={cellBodyStyle()}>
-                        {p.categoryName || p.categoryId || "Bilinmiyor"}
+                        {p.categoryName || "Bilinmiyor"}
                       </TableCell>
                       <TableCell sx={cellBodyStyle()}>
-                        {p.originalProductId || p.productId}
+                        {p.brand || "Yok"}
+                      </TableCell>
+                      <TableCell sx={cellBodyStyle()}>
+                        {p.originalProductId}
                       </TableCell>
                       <TableCell sx={cellBodyStyle()}>
                         {p.description || "Yok"}
@@ -97,12 +119,22 @@ export default function DeletedProductsTable() {
                         {p.deletedAt &&
                           new Date(p.deletedAt).toLocaleString("tr-TR")}
                       </TableCell>
+                      <TableCell sx={cellBodyStyle()} align="center">
+                        <Button
+                          variant="contained"
+                          color="error"
+                          size="small"
+                          onClick={() => restoreProduct(p.originalProductId)}
+                        >
+                          Kurtar
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                   {deletedProducts.length === 0 && (
                     <TableRow>
                       <TableCell
-                        colSpan={6}
+                        colSpan={8}
                         align="center"
                         sx={{ color: "#ffffff" }}
                       >

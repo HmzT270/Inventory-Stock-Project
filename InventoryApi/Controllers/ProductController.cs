@@ -16,12 +16,12 @@ namespace InventoryApi.Controllers
             _context = context;
         }
 
-        // DTO’lar
         public class ProductCreateDto
         {
             public string Name { get; set; } = string.Empty;
             public int Quantity { get; set; }
             public int CategoryId { get; set; }
+            public int? BrandId { get; set; }
             public string? Description { get; set; }
             public int CriticalStockLevel { get; set; }
         }
@@ -41,12 +41,12 @@ namespace InventoryApi.Controllers
             public int CategoryId { get; set; }
         }
 
-        // Tüm ürünleri sırayla getir
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetProducts()
         {
             var products = await _context.Product
                 .Include(p => p.Category)
+                .Include(p => p.Brand)
                 .Include(p => p.StockMovements)
                 .OrderBy(p => p.ProductId)
                 .ToListAsync();
@@ -62,11 +62,57 @@ namespace InventoryApi.Controllers
                 p.CreatedAt,
                 p.CriticalStockLevel,
                 Category = p.Category?.Name,
+                Brand = p.Brand?.Name,
+                BrandId = p.BrandId, // <-- Bunu ekle!
                 StockMovementCount = p.StockMovements?.Count ?? 0
             }));
         }
 
-        // Ürün ekle
+        [HttpGet("Sorted")]
+        public async Task<ActionResult<IEnumerable<object>>> GetSortedProducts([FromQuery] string orderBy = "serialnumber", [FromQuery] string direction = "asc")
+        {
+            var products = await _context.Product
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Include(p => p.StockMovements)
+                .ToListAsync();
+
+            var sorted = products.Select((p, i) => new
+            {
+                SerialNumber = i + 1,
+                p.ProductId,
+                p.Name,
+                p.Quantity,
+                p.CategoryId,
+                p.Description,
+                p.CreatedAt,
+                p.CriticalStockLevel,
+                Category = p.Category?.Name ?? "",
+                Brand = p.Brand?.Name ?? "",
+                BrandId = p.BrandId, // <-- Bunu ekle!
+                StockMovementCount = p.StockMovements?.Count ?? 0
+            });
+
+            sorted = (orderBy.ToLower(), direction.ToLower()) switch
+            {
+                ("name", "asc") => sorted.OrderBy(p => p.Name),
+                ("name", "desc") => sorted.OrderByDescending(p => p.Name),
+                ("serialnumber", "asc") => sorted.OrderBy(p => p.SerialNumber),
+                ("serialnumber", "desc") => sorted.OrderByDescending(p => p.SerialNumber),
+                ("quantity", "asc") => sorted.OrderBy(p => p.Quantity),
+                ("quantity", "desc") => sorted.OrderByDescending(p => p.Quantity),
+                ("category", "asc") => sorted.OrderBy(p => p.Category),
+                ("category", "desc") => sorted.OrderByDescending(p => p.Category),
+                ("brand", "asc") => sorted.OrderBy(p => p.Brand),
+                ("brand", "desc") => sorted.OrderByDescending(p => p.Brand),
+                ("createdat", "asc") => sorted.OrderBy(p => p.CreatedAt),
+                ("createdat", "desc") => sorted.OrderByDescending(p => p.CreatedAt),
+                _ => sorted.OrderBy(p => p.SerialNumber)
+            };
+
+            return Ok(sorted.ToList());
+        }
+
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(ProductCreateDto dto)
         {
@@ -75,6 +121,7 @@ namespace InventoryApi.Controllers
                 Name = dto.Name,
                 Quantity = dto.Quantity,
                 CategoryId = dto.CategoryId,
+                BrandId = dto.BrandId,
                 Description = dto.Description,
                 CriticalStockLevel = dto.CriticalStockLevel == 0 ? 10 : dto.CriticalStockLevel
             };
@@ -85,7 +132,6 @@ namespace InventoryApi.Controllers
             return CreatedAtAction(nameof(GetProducts), new { id = product.ProductId }, product);
         }
 
-        // Ürün adını değiştir
         [HttpPut("Rename/{id}")]
         public async Task<IActionResult> RenameProduct(int id, [FromBody] RenameProductDto dto)
         {
@@ -100,7 +146,6 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        // Ürünün kategorisini değiştir
         [HttpPut("{id}/ChangeCategory")]
         public async Task<IActionResult> ChangeCategory(int id, [FromBody] ChangeCategoryDto dto)
         {
@@ -116,7 +161,6 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        // Açıklamayı güncelle
         [HttpPut("{id}/UpdateDescription")]
         public async Task<IActionResult> UpdateDescription(int id, [FromBody] UpdateDescriptionDto dto)
         {
@@ -131,7 +175,6 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        // Stoğu güncelle
         [HttpPut("UpdateStock/{id}")]
         public async Task<IActionResult> UpdateStock(int id, [FromBody] int newStock)
         {
@@ -144,12 +187,12 @@ namespace InventoryApi.Controllers
             return Ok(product);
         }
 
-        // Ürünü sil ve DeletedProducts tablosuna ekle
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await _context.Product
                 .Include(p => p.Category)
+                .Include(p => p.Brand)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null) return NotFound();
@@ -161,6 +204,7 @@ namespace InventoryApi.Controllers
                 Description = product.Description,
                 DeletedAt = DateTime.Now,
                 CategoryName = product.Category?.Name,
+                Brand = product.Brand?.Name,
                 OriginalProductId = product.ProductId
             });
 
@@ -170,13 +214,13 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        // Kategoriye göre ürünleri getir
         [HttpGet("ByCategory/{categoryId}")]
         public async Task<ActionResult<IEnumerable<object>>> GetProductsByCategory(int categoryId)
         {
             var products = await _context.Product
                 .Where(p => p.CategoryId == categoryId)
                 .Include(p => p.Category)
+                .Include(p => p.Brand)
                 .Include(p => p.StockMovements)
                 .ToListAsync();
 
@@ -189,11 +233,11 @@ namespace InventoryApi.Controllers
                 p.CreatedAt,
                 p.CriticalStockLevel,
                 Category = p.Category?.Name,
+                Brand = p.Brand?.Name,
                 StockMovementCount = p.StockMovements?.Count ?? 0
             }));
         }
 
-        // Ada göre arama yap
         [HttpGet("SearchByName/{query}")]
         public async Task<ActionResult<IEnumerable<object>>> SearchByName(string query)
         {
@@ -205,6 +249,7 @@ namespace InventoryApi.Controllers
             var results = await _context.Product
                 .Where(p => p.Name.ToLower().Contains(lowered))
                 .Include(p => p.Category)
+                .Include(p => p.Brand)
                 .Include(p => p.StockMovements)
                 .OrderBy(p => p.Name)
                 .Take(20)
@@ -219,11 +264,12 @@ namespace InventoryApi.Controllers
                 p.CreatedAt,
                 p.CriticalStockLevel,
                 Category = p.Category?.Name,
+                Brand = p.Brand?.Name,
+                BrandId = p.BrandId, // <-- Bunu ekle!
                 StockMovementCount = p.StockMovements?.Count ?? 0
             }));
         }
 
-        // Son 10 silinen ürünü getir
         [HttpGet("Last10Deleted")]
         public async Task<ActionResult<IEnumerable<object>>> GetLast10DeletedProducts()
         {
@@ -237,11 +283,81 @@ namespace InventoryApi.Controllers
                     d.CategoryName,
                     d.OriginalProductId,
                     d.Description,
-                    d.DeletedAt
+                    d.DeletedAt,
+                    d.Brand
                 })
                 .ToListAsync();
 
             return Ok(deleted);
+        }
+
+        [HttpPut("UpdateAllCriticalStockLevel/{newLevel}")]
+        public async Task<IActionResult> UpdateAllCriticalStockLevel(int newLevel)
+        {
+            if (newLevel < 0)
+                return BadRequest("Kritik seviye negatif olamaz.");
+
+            var allProducts = await _context.Product.ToListAsync();
+
+            foreach (var product in allProducts)
+            {
+                product.CriticalStockLevel = newLevel;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = $"Tüm ürünlerin kritik seviyesi {newLevel} olarak güncellendi." });
+        }
+
+        [HttpGet("Any")]
+        public async Task<ActionResult<object>> GetAnyProduct()
+        {
+            var product = await _context.Product
+                .Include(p => p.Brand)
+                .OrderBy(p => p.ProductId)
+                .FirstOrDefaultAsync();
+
+            if (product == null) return NotFound();
+
+            return Ok(new
+            {
+                product.ProductId,
+                product.Name,
+                product.CriticalStockLevel,
+                Brand = product.Brand?.Name
+            });
+        }
+
+        [HttpPost("Restore/{originalProductId}")]
+        public async Task<IActionResult> RestoreProduct(int originalProductId)
+        {
+            var deleted = await _context.DeletedProducts
+                .FirstOrDefaultAsync(d => d.OriginalProductId == originalProductId);
+
+            if (deleted == null) return NotFound("Silinen ürün bulunamadı.");
+
+            var categoryId = await _context.Categories
+                .Where(c => c.Name == deleted.CategoryName)
+                .Select(c => c.CategoryId)
+                .FirstOrDefaultAsync();
+
+            if (categoryId == 0) return BadRequest("Kategori bulunamadı.");
+
+            var restoredProduct = new Product
+            {
+                Name = deleted.Name,
+                Quantity = deleted.Quantity,
+                Description = deleted.Description,
+                CreatedAt = DateTime.Now,
+                CategoryId = categoryId,
+                CriticalStockLevel = 10
+            };
+
+            _context.Product.Add(restoredProduct);
+            _context.DeletedProducts.Remove(deleted);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Ürün başarıyla geri yüklendi." });
         }
     }
 }

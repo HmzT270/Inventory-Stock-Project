@@ -6,12 +6,15 @@ import WarningIcon from "@mui/icons-material/WarningAmber";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import BlockIcon from "@mui/icons-material/Block";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import StoreIcon from "@mui/icons-material/Store";
 import { getAllProducts } from "../services/productService";
 import { getAllCategories } from "../services/categoryService";
+import { getAllBrands } from "../services/brandService";
 
 export default function Home() {
   const [productCount, setProductCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
+  const [brandCount, setBrandCount] = useState(0);
   const [criticalCount, setCriticalCount] = useState(0);
   const [outOfStockCount, setOutOfStockCount] = useState(0);
   const [lastProduct, setLastProduct] = useState(null);
@@ -35,6 +38,9 @@ export default function Home() {
 
       const categories = await getAllCategories();
       setCategoryCount(categories.length);
+
+      const brands = await getAllBrands();
+      setBrandCount(brands.length);
 
       try {
         const res = await fetch(
@@ -63,7 +69,6 @@ export default function Home() {
         minHeight: "60vh",
         width: "100%",
         display: "flex",
-        alignItems: "flex-start",
         justifyContent: "center",
         bgcolor: "transparent",
       }}
@@ -71,9 +76,7 @@ export default function Home() {
       <Box
         sx={{
           width: "100%",
-          maxWidth: 700,
-          mx: "auto",
-          px: { xs: 1, md: 2 },
+          px: { xs: 1, md: 3 },
         }}
       >
         <Typography
@@ -90,7 +93,15 @@ export default function Home() {
         </Typography>
 
         {/* Sayaç Kartları */}
-        <Box sx={{ display: "flex", flexWrap: "wrap", mb: 4, mx: -1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 2,
+            mb: 4,
+          }}
+        >
           {[
             {
               icon: <InventoryIcon fontSize="large" />,
@@ -105,6 +116,12 @@ export default function Home() {
               bg: "#21598b",
             },
             {
+              icon: <StoreIcon fontSize="large" />,
+              label: "Marka",
+              value: brandCount,
+              bg: "#146c43",
+            },
+            {
               icon: <WarningIcon fontSize="large" />,
               label: "Kritik Stok",
               value: criticalCount,
@@ -117,118 +134,115 @@ export default function Home() {
               bg: "#d32f2f",
             },
           ].map((item, i) => (
-            <Box
+            <Card
               key={i}
               sx={{
-                width: {
-                  xs: "50%",
-                  sm: "50%",
-                  md: "25%",
-                },
-                boxSizing: "border-box",
-                px: 0.5,
-                mb: 1,
+                bgcolor: item.bg,
+                color: "#fff",
+                borderRadius: 3,
+                boxShadow: 2,
+                width: { xs: "48%", sm: "30%", md: "18%" },
+                minWidth: 150,
               }}
             >
-              <Card
-                sx={{
-                  bgcolor: item.bg,
-                  color: "#fff",
-                  borderRadius: 3,
-                  boxShadow: 2,
-                  height: "100%",
-                }}
-              >
-                <CardContent>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    {item.icon}
-                    <Box>
-                      <Typography fontWeight={700} fontSize={18}>
-                        {item.value}
-                      </Typography>
-                      <Typography fontSize={15}>{item.label}</Typography>
-                    </Box>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Box>
+              <CardContent>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  {item.icon}
+                  <Box>
+                    <Typography fontWeight={700} fontSize={18}>
+                      {item.value}
+                    </Typography>
+                    <Typography fontSize={15}>{item.label}</Typography>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
           ))}
         </Box>
 
-        {/* Son Eklenen Ürün */}
-        {lastProduct && (
+        {/* Son Eklenen ve Son Silinen Ürün Kartları Yan Yana */}
+        {(lastProduct || lastDeleted) && (
           <Box
             sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 3,
               mt: 4,
-              backgroundColor: "rgba(16, 132, 199, 0)",
-              borderRadius: 2,
-              p: 3,
-              color: "#fff",
-              boxShadow: 2,
               mb: 3,
-              width: "100%",
-              maxWidth: 650,
-              mx: "auto",
             }}
           >
-            <Stack direction="row" spacing={1} alignItems="center" mb={2}>
-              <Typography fontWeight={800} fontSize={22}>
-                Son Eklenen Ürün
-              </Typography>
-              <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
-            </Stack>
-            <Typography sx={{ lineHeight: 2 }}>
-              <b>Ürün Adı:</b> {lastProduct.name} <br />
-              <b>Stok:</b> {lastProduct.quantity} <br />
-              <b>Kategori:</b> {lastProduct.category || "Bilinmiyor"} <br />
-              <b>Açıklama:</b> {lastProduct.description?.trim() || "Yok"} <br />
-              <b>Eklenme Tarihi:</b>{" "}
-              {new Date(lastProduct.createdAt).toLocaleString("tr-TR")}
-            </Typography>
+            {/* Son Eklenen Ürün */}
+            {lastProduct && (
+              <Box
+                sx={{
+                  flex: "1 1 300px",
+                  maxWidth: 600,
+                  backgroundColor: "rgba(16, 132, 199, 0)",
+                  borderRadius: 2,
+                  p: 3,
+                  color: "#fff",
+                  boxShadow: 2,
+                }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center" mb={2}>
+                  <Typography fontWeight={800} fontSize={22}>
+                    Son Eklenen Ürün
+                  </Typography>
+                  <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
+                </Stack>
+                <Typography sx={{ lineHeight: 2 }}>
+                  <b>Ürün Adı:</b> {lastProduct.name} <br />
+                  <b>Stok:</b> {lastProduct.quantity} <br />
+                  <b>Kategori:</b> {lastProduct.category || "Bilinmiyor"} <br />
+                  <b>Marka:</b> {lastProduct.brand || "Bilinmiyor"} <br />
+                  <b>Açıklama:</b>{" "}
+                  {lastProduct.description?.trim() || "Yok"} <br />
+                  <b>Eklenme Tarihi:</b>{" "}
+                  {new Date(lastProduct.createdAt).toLocaleString("tr-TR")}
+                </Typography>
+              </Box>
+            )}
+
+            {/* Son Silinen Ürün */}
+            {lastDeleted && (
+              <Box
+                sx={{
+                  flex: "1 1 300px",
+                  maxWidth: 600,
+                  backgroundColor: "rgba(16, 132, 199, 0)",
+                  borderRadius: 2,
+                  p: 3,
+                  color: "#fff",
+                  boxShadow: 2,
+                }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center" mb={2}>
+                  <Typography fontWeight={800} fontSize={22}>
+                    Son Silinen Ürün
+                  </Typography>
+                  <DeleteOutlineIcon sx={{ fontSize: 28 }} />
+                </Stack>
+                <Typography sx={{ lineHeight: 2 }}>
+                  <b>Ürün Adı:</b> {lastDeleted.name} <br />
+                  <b>Stok:</b> {lastDeleted.quantity} <br />
+                  <b>Kategori:</b>{" "}
+                  {lastDeleted.categoryName ||
+                    lastDeleted.CategoryId ||
+                    "Bilinmiyor"}{" "}
+                  <br />
+                  <b>Marka:</b> {lastDeleted.brand || "Bilinmiyor"} <br />
+                  <b>Açıklama:</b>{" "}
+                  {lastDeleted.description?.trim() || "Yok"} <br />
+                  <b>Silinme Tarihi:</b>{" "}
+                  {lastDeleted.deletedAt
+                    ? new Date(lastDeleted.deletedAt).toLocaleString("tr-TR")
+                    : ""}
+                </Typography>
+              </Box>
+            )}
           </Box>
         )}
-
-        {/* Son Silinen Ürün */}
-        <Box
-          sx={{
-            mt: 0,
-            backgroundColor: "rgba(16, 132, 199, 0)",
-            borderRadius: 2,
-            p: 3,
-            color: "#fff",
-            boxShadow: 2,
-            width: "100%",
-            maxWidth: 650,
-            mx: "auto",
-          }}
-        >
-          <Stack direction="row" spacing={1} alignItems="center" mb={2}>
-            <Typography fontWeight={800} fontSize={22}>
-              Son Silinen Ürün
-            </Typography>
-            <DeleteOutlineIcon sx={{ fontSize: 28 }} />
-          </Stack>
-          {lastDeleted ? (
-            <Typography sx={{ lineHeight: 2 }}>
-              <b>Ürün Adı:</b> {lastDeleted.name} <br />
-              <b>Stok:</b> {lastDeleted.quantity} <br />
-              <b>Kategori:</b>{" "}
-              {lastDeleted.categoryName ||
-                lastDeleted.CategoryId ||
-                "Bilinmiyor"}{" "}
-              <br />
-              <b>Açıklama:</b> {lastDeleted.description?.trim() || "Yok"} <br />
-              <b>Silinme Tarihi:</b>{" "}
-              {lastDeleted.deletedAt
-                ? new Date(lastDeleted.deletedAt).toLocaleString("tr-TR")
-                : ""}
-            </Typography>
-          ) : (
-            <Typography sx={{ lineHeight: 2, fontStyle: "italic" }}>
-              Henüz silinen ürün yok.
-            </Typography>
-          )}
-        </Box>
       </Box>
     </Box>
   );

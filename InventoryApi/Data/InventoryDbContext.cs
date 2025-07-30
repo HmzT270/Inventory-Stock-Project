@@ -10,6 +10,7 @@ namespace InventoryApi.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<StockMovement> StockMovements { get; set; }
-        public DbSet<DeletedProduct> DeletedProducts { get; set; } // <-- EKLENDİ!
+        public DbSet<DeletedProduct> DeletedProducts { get; set; }
+        public DbSet<Brand> Brands { get; set; } // <-- EKLENDİ!
     }
 }

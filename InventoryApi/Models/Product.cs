@@ -23,6 +23,11 @@ namespace InventoryApi.Models
 
         public int CriticalStockLevel { get; set; } = 10;
 
+        public int? BrandId { get; set; }  // Marka foreign key (nullable)
+
+        [ValidateNever]
+        public Brand? Brand { get; set; }  // Marka navigation (nullable)
+
         [ValidateNever]
         public Category Category { get; set; } = null!;
 
