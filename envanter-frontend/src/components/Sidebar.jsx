@@ -22,8 +22,9 @@ import {
   Menu as MenuIcon,
   Category,
 } from "@mui/icons-material";
-import { Link } from "react-router-dom";
 import BrandingWatermarkIcon from "@mui/icons-material/BrandingWatermark";
+import { Link, useNavigate } from "react-router-dom";
+import { useThemeContext } from "../components/ThemeContext";
 
 const DRAWER_WIDTH = 260;
 
@@ -31,6 +32,8 @@ export default function Sidebar({ children, role, username, onLogout }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const navigate = useNavigate();
+  const { darkMode } = useThemeContext();
 
   const menuItems = [
     { to: "/", icon: <Home />, label: "Ana Sayfa", always: true },
@@ -43,12 +46,8 @@ export default function Sidebar({ children, role, username, onLogout }) {
     { to: "/stock", icon: <Layers />, label: "Stok Yönetimi", admin: true },
   ];
 
-  const visibleMenu = menuItems.filter(
-    (item) => item.always || (item.admin && role === "admin")
-  );
-
   const hamburgerIconButtonSx = {
-    color: "#fff",
+    color: theme.palette.text.primary,
     p: "2px",
     ml: 0.2,
     width: 24,
@@ -63,10 +62,13 @@ export default function Sidebar({ children, role, username, onLogout }) {
       sx={{
         width: DRAWER_WIDTH,
         height: "100%",
-        color: "#fff",
+        color: theme.palette.text.primary,
         overflowX: "hidden",
+        overflowY: "auto",
         display: "flex",
         flexDirection: "column",
+        bgcolor: theme.palette.background.default,
+        whiteSpace: "nowrap", // Scroll engelle
       }}
       role="presentation"
       onClick={isMobile ? () => setDrawerOpen(false) : undefined}
@@ -86,7 +88,7 @@ export default function Sidebar({ children, role, username, onLogout }) {
             primary="Envanter Sistemi"
             primaryTypographyProps={{
               fontWeight: "bold",
-              color: "#fff",
+              color: theme.palette.text.primary,
               fontSize: 19,
             }}
             sx={{ m: 0, flex: 1, minWidth: 0 }}
@@ -101,57 +103,68 @@ export default function Sidebar({ children, role, username, onLogout }) {
           )}
         </ListItem>
 
-        {visibleMenu.map(({ to, icon, label }) => (
-          <ListItem
-            component={Link}
-            to={to}
-            key={to}
-            sx={{
-              "& .MuiListItemText-primary": {
-                padding: "10px 16px",
-                borderRadius: "15px",
-                transition:
-                  "background-color 0.6s ease, color 0.6s ease, transform 0.3s ease",
-                display: "inline-block",
-                minWidth: 120,
-                textAlign: "center",
-                lineHeight: "24px",
-                backgroundColor: "transparent",
-                color: "#fff",
-                whiteSpace: "nowrap",
-                transformOrigin: "center",
-              },
-              "&:hover .MuiListItemText-primary": {
-                backgroundColor: "white",
-                color: "#181818",
-                transform: "scale(1.2)",
-                borderRadius: "15px",
-              },
-            }}
-          >
-            <ListItemIcon sx={{ color: "#fff" }}>{icon}</ListItemIcon>
-            <ListItemText
-              primary={label}
-              primaryTypographyProps={{ color: "#fff" }}
-            />
-          </ListItem>
-        ))}
+        {menuItems.map(({ to, icon, label, always, admin }) => {
+          const isAdminOnly = admin && role !== "admin";
+          return (
+            <ListItem
+              component={isAdminOnly ? "div" : Link}
+              to={isAdminOnly ? undefined : to}
+              key={to}
+              sx={{
+                opacity: isAdminOnly ? 0.4 : 1,
+                pointerEvents: isAdminOnly ? "none" : "auto",
+                "& .MuiListItemText-primary": {
+                  padding: "10px 16px",
+                  borderRadius: "15px",
+                  transition:
+                    "background-color 0.6s ease, color 0.6s ease, transform 0.3s ease",
+                  display: "inline-block",
+                  minWidth: 120,
+                  textAlign: "center",
+                  lineHeight: "24px",
+                  backgroundColor: "transparent",
+                  color: theme.palette.text.primary,
+                  whiteSpace: "nowrap",
+                  transformOrigin: "center",
+                },
+                "&:hover .MuiListItemText-primary": !isAdminOnly && {
+                  backgroundColor: darkMode ? "#fff" : "#000",
+                  color: darkMode ? "#000" : "#fff",
+                  transform: "scale(1.2)",
+                  borderRadius: "15px",
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: theme.palette.text.primary }}>
+                {icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={label}
+                primaryTypographyProps={{ color: theme.palette.text.primary }}
+              />
+            </ListItem>
+          );
+        })}
       </List>
+
       <Box sx={{ flex: 1 }} />
       <Box sx={{ p: 2, pb: 3 }}>
-        <Typography sx={{ color: "#b6e6fa", fontWeight: 600, mb: 1 }}>
+        <Typography sx={{ color: theme.palette.text.secondary, fontWeight: 600, mb: 1 }}>
           {username ? `Giriş yapan: ${username}` : ""}
         </Typography>
         <Button
-          onClick={onLogout}
+          onClick={() => {
+            if (onLogout) onLogout();
+            navigate("/login");
+          }}
           variant="outlined"
           color="inherit"
           sx={{
-            color: "#fff",
-            borderColor: "#b6e6fa",
+            color: theme.palette.text.primary,
+            borderColor: theme.palette.text.secondary,
             "&:hover": {
-              backgroundColor: "#234872",
-              borderColor: "#b6e6fa",
+              backgroundColor: darkMode ? "#234872" : "#d0e0f0",
+              borderColor: theme.palette.text.secondary,
             },
             fontWeight: 600,
             width: "100%",
@@ -175,8 +188,10 @@ export default function Sidebar({ children, role, username, onLogout }) {
             position: "fixed",
             top: 16,
             zIndex: 2001,
-            backgroundColor: "#181818d0",
-            "&:hover": { backgroundColor: "#181818" },
+            backgroundColor: darkMode ? "#181818d0" : "#f5f5f5d0",
+            "&:hover": {
+              backgroundColor: darkMode ? "#181818" : "#f5f5f5",
+            },
             ...hamburgerIconButtonSx,
           }}
         >
@@ -191,25 +206,13 @@ export default function Sidebar({ children, role, username, onLogout }) {
         onClose={() => setDrawerOpen(false)}
         ModalProps={{ keepMounted: true }}
         PaperProps={{
-          sx: isMobile
-            ? {
-                width: DRAWER_WIDTH,
-                boxSizing: "border-box",
-                backgroundColor: "#181818",
-                color: "#fff",
-                overflowX: "hidden",
-                position: "fixed",
-                left: 0,
-                top: 0,
-                height: "100%",
-              }
-            : {
-                width: DRAWER_WIDTH,
-                boxSizing: "border-box",
-                background: "#18181805",
-                color: "#fff",
-                overflowX: "hidden",
-              },
+          sx: {
+            width: DRAWER_WIDTH,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.background.default,
+            color: theme.palette.text.primary,
+            overflowX: "hidden",
+          },
         }}
         sx={{
           width: DRAWER_WIDTH,
@@ -223,16 +226,14 @@ export default function Sidebar({ children, role, username, onLogout }) {
         component="main"
         sx={{
           flexGrow: 1,
-          ml: {
-            xs: 0,
-            sm: 0,
-            md: 0,
-          },
+          ml: { xs: 0, sm: 0, md: 0 },
           p: { xs: 2, md: 3 },
           minHeight: "100vh",
           boxSizing: "border-box",
           overflowY: "auto",
           overflowX: "hidden",
+          bgcolor: theme.palette.background.default,
+          color: theme.palette.text.primary,
         }}
       >
         {children}

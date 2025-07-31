@@ -17,9 +17,9 @@ import {
 import { getAllCategories } from "../services/categoryService";
 
 const labelSx = {
-  color: "#fff",
-  "&.Mui-focused": { color: "#fff" },
-  "&.MuiInputLabel-shrink": { color: "#fff" },
+  color: "text.primary",
+  "&.Mui-focused": { color: "text.primary" },
+  "&.MuiInputLabel-shrink": { color: "text.primary" },
 };
 
 export default function ProductEdit() {
@@ -31,10 +31,7 @@ export default function ProductEdit() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newDescription, setNewDescription] = useState("");
   const [statusTop, setStatusTop] = useState({ success: null, message: "" });
-  const [statusBottom, setStatusBottom] = useState({
-    success: null,
-    message: "",
-  });
+  const [statusBottom, setStatusBottom] = useState({ success: null, message: "" });
   const [showTopStatus, setShowTopStatus] = useState(false);
   const [showBottomStatus, setShowBottomStatus] = useState(false);
 
@@ -51,9 +48,7 @@ export default function ProductEdit() {
   const showTemporaryMessage = (setStatus, setShowStatus, newStatus) => {
     setStatus(newStatus);
     setShowStatus(true);
-    setTimeout(() => {
-      setShowStatus(false);
-    }, 3000);
+    setTimeout(() => setShowStatus(false), 3000);
   };
 
   const handleRename = async () => {
@@ -176,8 +171,8 @@ export default function ProductEdit() {
               p: 3,
               borderRadius: 3,
               boxShadow: 2,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.paper",
+              color: "text.primary",
             }}
           >
             <Typography variant="h5" fontWeight={700} mb={2} gutterBottom>
@@ -193,7 +188,7 @@ export default function ProductEdit() {
                 option.productId === value.productId
               }
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                paper: { sx: { bgcolor: "background.default", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -202,9 +197,9 @@ export default function ProductEdit() {
                   fullWidth
                   sx={{ mb: 2.5 }}
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#ffffff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                 />
               )}
@@ -217,7 +212,7 @@ export default function ProductEdit() {
               fullWidth
               sx={{ mb: 2.5 }}
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#fff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
             />
 
             <Autocomplete
@@ -229,7 +224,7 @@ export default function ProductEdit() {
                 option.categoryId === value.categoryId
               }
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -238,9 +233,9 @@ export default function ProductEdit() {
                   fullWidth
                   sx={{ mb: 2.5 }}
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#ffffff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                 />
               )}
@@ -294,8 +289,8 @@ export default function ProductEdit() {
               p: 3,
               borderRadius: 3,
               boxShadow: 2,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.paper",
+              color: "text.primary",
             }}
           >
             <Typography variant="h5" fontWeight={700} mb={2} gutterBottom>
@@ -311,7 +306,7 @@ export default function ProductEdit() {
                 option.productId === value.productId
               }
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -320,9 +315,9 @@ export default function ProductEdit() {
                   fullWidth
                   sx={{ mb: 2.5 }}
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#fff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                 />
               )}
@@ -337,7 +332,7 @@ export default function ProductEdit() {
               rows={3}
               sx={{ mb: 2.5 }}
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#fff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
             />
 
             <Button

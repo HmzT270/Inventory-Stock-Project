@@ -15,14 +15,6 @@ body,
   height: 100%;
   min-height: 100%;
   box-sizing: border-box;
-  background: linear-gradient(
-    120deg,
-    #2341e7 0%,
-    #4dd1cf 40%,
-    #8947ca 80%,
-    #0d0f0f 100%
-  ) no-repeat fixed;
-  background-size: cover;
 }
 
 body {

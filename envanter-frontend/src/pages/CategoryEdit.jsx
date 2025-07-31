@@ -19,9 +19,9 @@ import {
 import { getProductsByCategory } from "../services/productService";
 
 const labelSx = {
-  color: "#fff",
-  "&.Mui-focused": { color: "#fff" },
-  "&.MuiInputLabel-shrink": { color: "#fff" },
+  color: "text.primary",
+  "&.Mui-focused": { color: "text.primary" },
+  "&.MuiInputLabel-shrink": { color: "text.primary" },
 };
 
 export default function CategoryEdit() {
@@ -32,20 +32,15 @@ export default function CategoryEdit() {
   const [newRename, setNewRename] = useState("");
 
   const [addStatus, setAddStatus] = useState({ success: null, message: "" });
-  const [deleteStatus, setDeleteStatus] = useState({
-    success: null,
-    message: "",
-  });
-  const [renameStatus, setRenameStatus] = useState({
-    success: null,
-    message: "",
-  });
+  const [deleteStatus, setDeleteStatus] = useState({ success: null, message: "" });
+  const [renameStatus, setRenameStatus] = useState({ success: null, message: "" });
 
   const [showAddStatus, setShowAddStatus] = useState(false);
   const [showDeleteStatus, setShowDeleteStatus] = useState(false);
   const [showRenameStatus, setShowRenameStatus] = useState(false);
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [relatedProductCount, setRelatedProductCount] = useState(0);
 
   const showTemporaryMessage = (setStatus, setShowStatus, newStatus) => {
     setStatus(newStatus);
@@ -103,6 +98,7 @@ export default function CategoryEdit() {
       );
 
       if (relatedProducts.length > 0) {
+        setRelatedProductCount(relatedProducts.length);
         setShowDeleteConfirm(true);
         return;
       }
@@ -127,7 +123,7 @@ export default function CategoryEdit() {
       await deleteCategory(deleteCategoryValue.categoryId);
       showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
         success: true,
-        message: "Kategori ve bağlı ürünler silindi.",
+        message: `Kategori ve bağlı ${relatedProductCount} ürün silindi.`,
       });
       setDeleteCategoryValue(null);
       setShowDeleteConfirm(false);
@@ -138,6 +134,14 @@ export default function CategoryEdit() {
         message: "Kategori silinemedi.",
       });
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+    showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
+      success: false,
+      message: "Silme işlemi iptal edildi.",
+    });
   };
 
   const handleRename = async () => {
@@ -179,15 +183,16 @@ export default function CategoryEdit() {
       }}
     >
       <Grid rowSpacing={3} container spacing={6} justifyContent="center">
+
         {/* Kategori Ekle */}
         <Grid>
           <Paper
             sx={{
               width: 340,
-              height: 150,
+              height: 203,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -201,7 +206,7 @@ export default function CategoryEdit() {
               onChange={(e) => setAddName(e.target.value)}
               fullWidth
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#fff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
               sx={{ mb: 2 }}
             />
             <Button
@@ -237,8 +242,8 @@ export default function CategoryEdit() {
               width: 340,
               minHeight: 150,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -258,7 +263,7 @@ export default function CategoryEdit() {
                 setShowDeleteConfirm(false);
               }}
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -266,9 +271,9 @@ export default function CategoryEdit() {
                   label="Kategori Seç"
                   fullWidth
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#fff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                   sx={{ mb: 2 }}
                 />
@@ -293,18 +298,19 @@ export default function CategoryEdit() {
                   mt: 2,
                   p: 1,
                   borderRadius: 2,
-                  bgcolor: "rgba(255, 255, 255, 0)",
-                  border: "1px solid rgba(255, 255, 255, 1)",
+                  bgcolor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
                 }}
               >
-                <Typography variant="body2" sx={{ color: "#fff", mb: 0 }}>
-                  Bu kategoriye bağlı ürünler var. Yine de silinsin mi?
+                <Typography variant="body2" sx={{ color: "text.primary", mb: 0 }}>
+                  Bu kategoriye bağlı {relatedProductCount} ürün var. Yine de silinsin mi?
                 </Typography>
                 <Box display="flex" gap={2} mt={1}>
                   <Button
                     size="small"
                     variant="outlined"
-                    sx={{ color: "rgba(255, 255, 255, 1)", borderColor: "rgba(252, 129, 129, 1)" }}
+                    sx={{ color: "error.main", borderColor: "error.main" }}
                     onClick={handleConfirmDelete}
                   >
                     Evet
@@ -312,8 +318,8 @@ export default function CategoryEdit() {
                   <Button
                     size="small"
                     variant="outlined"
-                    onClick={() => setShowDeleteConfirm(false)}
-                    sx={{ color: "rgba(255, 255, 255, 1)", borderColor: "rgba(164, 238, 174, 1)" }}
+                    onClick={handleCancelDelete}
+                    sx={{ color: "success.main", borderColor: "success.main" }}
                   >
                     Hayır
                   </Button>
@@ -339,10 +345,10 @@ export default function CategoryEdit() {
           <Paper
             sx={{
               width: 340,
-              height: 225,
+              height: 270,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -359,7 +365,7 @@ export default function CategoryEdit() {
               value={renameCategoryValue}
               onChange={(e, val) => setRenameCategoryValue(val)}
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -367,9 +373,9 @@ export default function CategoryEdit() {
                   label="Kategori Seç"
                   fullWidth
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#fff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                   sx={{ mb: 2 }}
                 />
@@ -381,7 +387,7 @@ export default function CategoryEdit() {
               onChange={(e) => setNewRename(e.target.value)}
               fullWidth
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#fff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
               sx={{ mb: 2 }}
             />
             <Button
@@ -409,6 +415,7 @@ export default function CategoryEdit() {
             </Fade>
           </Grid>
         </Grid>
+
       </Grid>
     </Box>
   );

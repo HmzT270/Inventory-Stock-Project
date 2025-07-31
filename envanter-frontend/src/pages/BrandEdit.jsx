@@ -16,11 +16,12 @@ import {
   deleteBrand,
   renameBrand,
 } from "../services/brandService";
+import axios from "axios";
 
 const labelSx = {
-  color: "#fff",
-  "&.Mui-focused": { color: "#fff" },
-  "&.MuiInputLabel-shrink": { color: "#fff" },
+  color: "text.primary",
+  "&.Mui-focused": { color: "text.primary" },
+  "&.MuiInputLabel-shrink": { color: "text.primary" },
 };
 
 export default function BrandEdit() {
@@ -37,6 +38,11 @@ export default function BrandEdit() {
   const [showAddStatus, setShowAddStatus] = useState(false);
   const [showDeleteStatus, setShowDeleteStatus] = useState(false);
   const [showRenameStatus, setShowRenameStatus] = useState(false);
+
+  // Silme onay kutusu için state
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [relatedCount, setRelatedCount] = useState(0);
 
   const showTemporaryMessage = (setStatus, setShowStatus, newStatus) => {
     setStatus(newStatus);
@@ -85,7 +91,21 @@ export default function BrandEdit() {
       });
       return;
     }
+
     try {
+      // Önce markaya ait ürün var mı kontrol et
+      const res = await axios.get(
+        `http://localhost:5184/api/Product/ByBrand/${deleteBrandValue.brandId}`
+      );
+
+      if (res.data && res.data.length > 0) {
+        setPendingDelete(deleteBrandValue);
+        setRelatedCount(res.data.length);
+        setConfirmDeleteVisible(true); // ✅ Onay kutusunu aç
+        return;
+      }
+
+      // Ürün yoksa direkt sil
       await deleteBrand(deleteBrandValue.brandId);
       showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
         success: true,
@@ -96,7 +116,36 @@ export default function BrandEdit() {
     } catch {
       showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
         success: false,
-        message: "Marka silinemedi.",
+        message: "Marka silinemedi",
+      });
+    }
+  };
+
+  const confirmDelete = async (confirm) => {
+    setConfirmDeleteVisible(false);
+
+    if (!confirm || !pendingDelete) {
+      // ❌ Kullanıcı "Hayır" dedi
+      showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
+        success: false,
+        message: "Silme işlemi iptal edildi.",
+      });
+      return;
+    }
+
+    try {
+      await deleteBrand(pendingDelete.brandId);
+      showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
+        success: true,
+        message: "Marka ve ürünleri silindi.",
+      });
+      setDeleteBrandValue(null);
+      setPendingDelete(null);
+      refreshBrands();
+    } catch {
+      showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
+        success: false,
+        message: "Marka silinemedi",
       });
     }
   };
@@ -145,10 +194,10 @@ export default function BrandEdit() {
           <Paper
             sx={{
               width: 340,
-              height: 150,
+              height: 203,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -162,7 +211,7 @@ export default function BrandEdit() {
               onChange={(e) => setAddName(e.target.value)}
               fullWidth
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#fff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
               sx={{ mb: 2 }}
             />
             <Button
@@ -198,8 +247,8 @@ export default function BrandEdit() {
               width: 340,
               minHeight: 150,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -210,10 +259,16 @@ export default function BrandEdit() {
             <Autocomplete
               options={brands}
               getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) =>
+                option.brandId === value.brandId
+              }
               value={deleteBrandValue}
-              onChange={(e, val) => setDeleteBrandValue(val)}
+              onChange={(e, val) => {
+                setDeleteBrandValue(val);
+                setConfirmDeleteVisible(false);
+              }}
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -221,9 +276,9 @@ export default function BrandEdit() {
                   label="Marka Seç"
                   fullWidth
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#fff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                   sx={{ mb: 2 }}
                 />
@@ -241,7 +296,44 @@ export default function BrandEdit() {
             >
               Sil
             </Button>
+
+            {/* ✅ Onay Kutusu */}
+            {confirmDeleteVisible && (
+              <Box
+                sx={{
+                  mt: 2,
+                  p: 1,
+                  borderRadius: 2,
+                  bgcolor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+              >
+                <Typography variant="body2" sx={{ color: "text.primary", mb: 0 }}>
+                  Bu markaya bağlı {relatedCount} ürün var. Yine de silinsin mi?
+                </Typography>
+                <Box display="flex" gap={2} mt={1}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    sx={{ color: "error.main", borderColor: "error.main" }}
+                    onClick={() => confirmDelete(true)}
+                  >
+                    Evet
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => confirmDelete(false)}
+                    sx={{ color: "success.main", borderColor: "success.main" }}
+                  >
+                    Hayır
+                  </Button>
+                </Box>
+              </Box>
+            )}
           </Paper>
+
           <Grid sx={{ mt: 2, height: 40 }}>
             <Fade in={showDeleteStatus} timeout={1500}>
               <Box sx={{ width: "100%" }}>
@@ -260,10 +352,10 @@ export default function BrandEdit() {
           <Paper
             sx={{
               width: 340,
-              height: 225,
+              height: 270,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#fff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -277,7 +369,7 @@ export default function BrandEdit() {
               value={renameBrandValue}
               onChange={(e, val) => setRenameBrandValue(val)}
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -285,9 +377,9 @@ export default function BrandEdit() {
                   label="Marka Seç"
                   fullWidth
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#fff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                   sx={{ mb: 2 }}
                 />
@@ -299,7 +391,7 @@ export default function BrandEdit() {
               onChange={(e) => setNewRename(e.target.value)}
               fullWidth
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#fff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
               sx={{ mb: 2 }}
             />
             <Button

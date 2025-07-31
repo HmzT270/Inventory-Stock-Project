@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Box, IconButton } from "@mui/material";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 import Sidebar from "./components/Sidebar";
 import Home from "./pages/Home";
@@ -10,18 +13,19 @@ import CategoryEdit from "./pages/CategoryEdit";
 import BrandEdit from "./pages/BrandEdit";
 import StockMovements from "./pages/StockMovements";
 import DeletedProductsTable from "./pages/DeletedProductsTable";
-
 import LoginForm from "./pages/LoginForm";
 import RegisterForm from "./pages/RegisterForm";
 
-export default function App() {
+import { ThemeContextProvider, useThemeContext } from "./components/ThemeContext";
+
+function AppContent() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [username, setUsername] = useState("");
   const [sessionError, setSessionError] = useState(false);
 
-  // Oturumu sekmeler arası takip et!
+  const { darkMode, toggleTheme } = useThemeContext();
+
   useEffect(() => {
     const checkSession = () => {
       const storedUser = localStorage.getItem("currentUser");
@@ -41,67 +45,104 @@ export default function App() {
     return () => clearInterval(interval);
   }, [loggedIn]);
 
+  const handleLogout = () => {
+    setLoggedIn(false);
+    setUserRole(null);
+    setUsername("");
+  };
+
   if (sessionError) {
     return (
       <div style={{ color: "red", fontSize: 20, textAlign: "center", marginTop: 50 }}>
         Bu hesaptan çıkış yaptınız veya başka bir sekmede farklı bir hesapla giriş yapıldı!
         <br />
-        <button onClick={() => window.location.reload()}>Yeniden Giriş Yap</button>
+        <button onClick={() => (window.location.href = "/login")}>Yeniden Giriş Yap</button>
       </div>
     );
   }
 
-  if (!loggedIn) {
-    return showRegister ? (
-      <RegisterForm
-        onRegister={(role, username) => {
-          setUserRole(role);
-          setUsername(username);
-          setLoggedIn(true);
-          setShowRegister(false);
-        }}
-        onSwitchToLogin={() => setShowRegister(false)}
-      />
-    ) : (
-      <LoginForm
-        onLogin={(role, username) => {
-          setUserRole(role);
-          setUsername(username);
-          setLoggedIn(true);
-        }}
-        onSwitchToRegister={() => setShowRegister(true)}
-      />
-    );
-  }
-
-  if (userRole === "user") {
-    return (
-      <Router>
-        <Sidebar role={userRole} username={username}>
-          <Routes>
-            <Route path="/" element={<ProductList />} />
-            <Route path="/products" element={<ProductList />} />
-          </Routes>
-        </Sidebar>
-      </Router>
-    );
-  }
-
-  // Admin
   return (
     <Router>
-      <Sidebar role={userRole} username={username}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductList />} />
-          <Route path="/product-management" element={<ProductManagement />} />
-          <Route path="/rename-product" element={<ProductEdit />} />
-          <Route path="/deleted-products" element={<DeletedProductsTable />} />
-          <Route path="/kategori-duzenle" element={<CategoryEdit />} />
-          <Route path="/marka-duzenle" element={<BrandEdit />} />
-          <Route path="/stock" element={<StockMovements />} />
-        </Routes>
-      </Sidebar>
+      {/* Sağ üstte Dark/Light butonu */}
+        <Box position="fixed" top={10} right={10} zIndex={1500}>
+          <IconButton onClick={toggleTheme} color="inherit">
+            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
+        </Box>
+
+      <Routes>
+        {/* Login & Register */}
+        <Route
+          path="/login"
+          element={
+            loggedIn ? (
+              <Navigate to="/" />
+            ) : (
+              <LoginForm
+                onLogin={(role, username) => {
+                  setUserRole(role);
+                  setUsername(username);
+                  setLoggedIn(true);
+                }}
+                onSwitchToRegister={() => (window.location.href = "/register")}
+              />
+            )
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            loggedIn ? (
+              <Navigate to="/" />
+            ) : (
+              <RegisterForm
+                onRegister={(role, username) => {
+                  setUserRole(role);
+                  setUsername(username);
+                  setLoggedIn(true);
+                }}
+                onSwitchToLogin={() => (window.location.href = "/login")}
+              />
+            )
+          }
+        />
+
+        {/* Kullanıcı veya Admin için ortak layout */}
+        {loggedIn && (
+          <Route
+            path="/*"
+            element={
+              <Sidebar role={userRole} username={username} onLogout={handleLogout}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<ProductList />} />
+                  {userRole === "admin" && (
+                    <>
+                      <Route path="/product-management" element={<ProductManagement />} />
+                      <Route path="/rename-product" element={<ProductEdit />} />
+                      <Route path="/deleted-products" element={<DeletedProductsTable />} />
+                      <Route path="/kategori-duzenle" element={<CategoryEdit />} />
+                      <Route path="/marka-duzenle" element={<BrandEdit />} />
+                      <Route path="/stock" element={<StockMovements />} />
+                    </>
+                  )}
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </Sidebar>
+            }
+          />
+        )}
+
+        {!loggedIn && <Route path="*" element={<Navigate to="/login" />} />}
+      </Routes>
     </Router>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeContextProvider>
+      <AppContent />
+    </ThemeContextProvider>
   );
 }

@@ -1,93 +1,102 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { IconButton, Tooltip } from "@mui/material";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
+// components/ThemeContext.jsx
+import React, { createContext, useContext, useState } from "react";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
-const ColorModeContext = createContext();
+const ThemeContext = createContext();
 
-export function useColorMode() {
-  return useContext(ColorModeContext);
-}
+export const ThemeContextProvider = ({ children }) => {
+  const [darkMode, setDarkMode] = useState(true); // Varsayılan dark
 
-// Tema Değiştirme Butonu
-export function ThemeToggleButton() {
-  const { mode, toggleColorMode } = useColorMode();
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? "dark" : "light",
+      ...(darkMode
+        ? {
+            background: {
+              default: "#121212",
+              paper: "#1e1e1e",
+            },
+            text: {
+              primary: "#ffffff",
+              secondary: "#b3b3b3",
+            },
+          }
+        : {
+            background: {
+              default: "#f5f5f5",
+              paper: "#ffffff",
+            },
+            text: {
+              primary: "#000000",
+              secondary: "#333333",
+            },
+          }),
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: (theme) => ({
+          html: {
+            height: "100%",
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+          body: {
+            minHeight: "100%",
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.background.default,
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+          "#root": {
+            height: "100%",
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+          // Paper, Card, Box ve Grid için global geçiş
+          ".MuiGrid-root, .MuiPaper-root, .MuiCard-root, .MuiBox-root": {
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+        }),
+      },
+      MuiGrid: {
+        styleOverrides: {
+          root: {
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+        },
+      },
+      MuiBox: {
+        styleOverrides: {
+          root: {
+            transition: "background-color 0.6s ease, color 0.6s ease",
+          },
+        },
+      },
+    },
+  });
+
+  const toggleTheme = () => setDarkMode(!darkMode);
 
   return (
-    <Tooltip title={mode === "dark" ? "Açık Tema" : "Koyu Tema"}>
-      <IconButton onClick={toggleColorMode} color="inherit">
-        {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-      </IconButton>
-    </Tooltip>
+    <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </ThemeProvider>
+    </ThemeContext.Provider>
   );
-}
+};
 
-export default function CustomThemeProvider({ children }) {
-  const [mode, setMode] = useState(
-    localStorage.getItem("colorMode") || "light"
-  );
-
-  const colorMode = useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => {
-          const next = prevMode === "light" ? "dark" : "light";
-          localStorage.setItem("colorMode", next);
-          return next;
-        });
-      },
-      mode,
-    }),
-    [mode]
-  );
-
-  const theme = useMemo(() => {
-    const baseTheme = createTheme({
-      palette: {
-        mode,
-        ...(mode === "dark"
-          ? {
-              background: {
-                default: "#151e14ff",
-                paper: "#485fabc3",
-              },
-              primary: { main: "#640e93ff" },
-              secondary: { main: "#1fb07eff" },
-              text: { primary: "#ffffffff", secondary: "#000000ff" },
-            }
-          : {
-              background: {
-                default: "#a4adafff", // Daha yumuşak açık tema
-                paper: "#272626ff",
-              },
-              primary: { main: "#8fbbe3ff" },
-              secondary: { main: "#6baee8" },
-              text: { primary: "#ffffffff", secondary: "#418acb" },
-            }),
-      },
-    });
-
-    // custom alanları dışarıdan ekliyoruz
-    baseTheme.custom = {
-      sidebar: mode === "dark" ? "#03071eff" : "#912a2ad0",
-      tablerRow: mode === "dark" ? "#ff0059ff" : "#834fcdff",
-      tableRowHover: mode === "dark" ? "#2acb1eff" : "#cde0f7",
-      tableHeader: mode === "dark" ? "#3944bcff" : "#a6c6e7",
-      buttonSucces: mode === "dark" ? "#1a753153" : "#1976d2",
-      buttonSuccesHover: mode === "dark" ? "#19a656ff" : "#1565c0", // ← yeni eklendi
-      buttonAlert: mode === "dark" ? "#8a2449ff" : "#81c784",
-      ButtonAlertHover: mode === "dark" ? "#b51e50ff" : "#e57373",
-      cardBackground: mode === "dark" ? "#9c546cff" : "#e57373",
-      textMuted: mode === "dark" ? "#ffffffff" : "#ffffffff",
-    };
-
-    return baseTheme;
-  }, [mode]);
-
-  return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
-    </ColorModeContext.Provider>
-  );
-}
+export const useThemeContext = () => useContext(ThemeContext);

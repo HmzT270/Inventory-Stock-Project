@@ -24,6 +24,7 @@ namespace InventoryApi.Controllers
             public int? BrandId { get; set; }
             public string? Description { get; set; }
             public int CriticalStockLevel { get; set; }
+            public string? CreatedBy { get; set; }
         }
 
         public class UpdateDescriptionDto
@@ -39,6 +40,11 @@ namespace InventoryApi.Controllers
         public class ChangeCategoryDto
         {
             public int CategoryId { get; set; }
+        }
+
+        public class DeleteProductDto
+        {
+            public string? DeletedBy { get; set; }
         }
 
         [HttpGet]
@@ -61,9 +67,10 @@ namespace InventoryApi.Controllers
                 p.Description,
                 p.CreatedAt,
                 p.CriticalStockLevel,
+                p.CreatedBy,
                 Category = p.Category?.Name,
                 Brand = p.Brand?.Name,
-                BrandId = p.BrandId, // <-- Bunu ekle!
+                BrandId = p.BrandId,
                 StockMovementCount = p.StockMovements?.Count ?? 0
             }));
         }
@@ -87,9 +94,10 @@ namespace InventoryApi.Controllers
                 p.Description,
                 p.CreatedAt,
                 p.CriticalStockLevel,
+                p.CreatedBy,
                 Category = p.Category?.Name ?? "",
                 Brand = p.Brand?.Name ?? "",
-                BrandId = p.BrandId, // <-- Bunu ekle!
+                BrandId = p.BrandId,
                 StockMovementCount = p.StockMovements?.Count ?? 0
             });
 
@@ -123,7 +131,8 @@ namespace InventoryApi.Controllers
                 CategoryId = dto.CategoryId,
                 BrandId = dto.BrandId,
                 Description = dto.Description,
-                CriticalStockLevel = dto.CriticalStockLevel == 0 ? 10 : dto.CriticalStockLevel
+                CriticalStockLevel = dto.CriticalStockLevel == 0 ? 10 : dto.CriticalStockLevel,
+                CreatedBy = dto.CreatedBy
             };
 
             _context.Product.Add(product);
@@ -188,7 +197,7 @@ namespace InventoryApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id, [FromBody] DeleteProductDto dto)
         {
             var product = await _context.Product
                 .Include(p => p.Category)
@@ -205,7 +214,9 @@ namespace InventoryApi.Controllers
                 DeletedAt = DateTime.Now,
                 CategoryName = product.Category?.Name,
                 Brand = product.Brand?.Name,
-                OriginalProductId = product.ProductId
+                OriginalProductId = product.ProductId,
+                DeletedBy = dto.DeletedBy,
+                CreatedBy = product.CreatedBy // ✅ Ekleyen kişi bilgisi kaydedildi
             });
 
             _context.Product.Remove(product);
@@ -232,11 +243,39 @@ namespace InventoryApi.Controllers
                 p.Description,
                 p.CreatedAt,
                 p.CriticalStockLevel,
+                p.CreatedBy,
                 Category = p.Category?.Name,
                 Brand = p.Brand?.Name,
                 StockMovementCount = p.StockMovements?.Count ?? 0
             }));
         }
+
+        // ✅ Belirli bir markaya ait tüm ürünleri getir
+[HttpGet("ByBrand/{brandId}")]
+public async Task<ActionResult<IEnumerable<object>>> GetProductsByBrand(int brandId)
+{
+    var products = await _context.Product
+        .Where(p => p.BrandId == brandId)
+        .Include(p => p.Category)
+        .Include(p => p.Brand)
+        .Include(p => p.StockMovements)
+        .ToListAsync();
+
+    return Ok(products.Select(p => new
+    {
+        p.ProductId,
+        p.Name,
+        p.Quantity,
+        p.Description,
+        p.CreatedAt,
+        p.CriticalStockLevel,
+        p.CreatedBy,
+        Category = p.Category?.Name,
+        Brand = p.Brand?.Name,
+        StockMovementCount = p.StockMovements?.Count ?? 0
+    }));
+}
+
 
         [HttpGet("SearchByName/{query}")]
         public async Task<ActionResult<IEnumerable<object>>> SearchByName(string query)
@@ -263,9 +302,10 @@ namespace InventoryApi.Controllers
                 p.Description,
                 p.CreatedAt,
                 p.CriticalStockLevel,
+                p.CreatedBy,
                 Category = p.Category?.Name,
                 Brand = p.Brand?.Name,
-                BrandId = p.BrandId, // <-- Bunu ekle!
+                BrandId = p.BrandId,
                 StockMovementCount = p.StockMovements?.Count ?? 0
             }));
         }
@@ -284,7 +324,9 @@ namespace InventoryApi.Controllers
                     d.OriginalProductId,
                     d.Description,
                     d.DeletedAt,
-                    d.Brand
+                    d.Brand,
+                    d.DeletedBy,
+                    d.CreatedBy // ✅ Ekleyen kullanıcı bilgisi de listelendi
                 })
                 .ToListAsync();
 
@@ -324,40 +366,62 @@ namespace InventoryApi.Controllers
                 product.ProductId,
                 product.Name,
                 product.CriticalStockLevel,
+                product.CreatedBy,
                 Brand = product.Brand?.Name
             });
         }
 
         [HttpPost("Restore/{originalProductId}")]
-        public async Task<IActionResult> RestoreProduct(int originalProductId)
-        {
-            var deleted = await _context.DeletedProducts
-                .FirstOrDefaultAsync(d => d.OriginalProductId == originalProductId);
+public async Task<IActionResult> RestoreProduct(int originalProductId)
+{
+    var deleted = await _context.DeletedProducts
+        .FirstOrDefaultAsync(d => d.OriginalProductId == originalProductId);
 
-            if (deleted == null) return NotFound("Silinen ürün bulunamadı.");
+    if (deleted == null) return NotFound("Silinen ürün bulunamadı.");
 
-            var categoryId = await _context.Categories
-                .Where(c => c.Name == deleted.CategoryName)
-                .Select(c => c.CategoryId)
-                .FirstOrDefaultAsync();
+    // Kategori kontrolü
+    var categoryId = await _context.Categories
+        .Where(c => c.Name == deleted.CategoryName)
+        .Select(c => c.CategoryId)
+        .FirstOrDefaultAsync();
 
-            if (categoryId == 0) return BadRequest("Kategori bulunamadı.");
+    if (categoryId == 0)
+        return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu kategori artık mevcut değil.");
 
-            var restoredProduct = new Product
-            {
-                Name = deleted.Name,
-                Quantity = deleted.Quantity,
-                Description = deleted.Description,
-                CreatedAt = DateTime.Now,
-                CategoryId = categoryId,
-                CriticalStockLevel = 10
-            };
+    // Marka kontrolü (varsa)
+    int? brandId = null;
+    if (!string.IsNullOrEmpty(deleted.Brand))
+    {
+        brandId = await _context.Brands
+            .Where(b => b.Name == deleted.Brand)
+            .Select(b => b.BrandId)
+            .FirstOrDefaultAsync();
 
-            _context.Product.Add(restoredProduct);
-            _context.DeletedProducts.Remove(deleted);
-            await _context.SaveChangesAsync();
+        if (brandId == 0)
+            return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu marka artık mevcut değil.");
 
-            return Ok(new { message = "Ürün başarıyla geri yüklendi." });
-        }
+        // brandId = 0 döndüyse null yapalım
+        if (brandId == 0) brandId = null;
+    }
+
+    var restoredProduct = new Product
+    {
+        Name = deleted.Name,
+        Quantity = deleted.Quantity,
+        Description = deleted.Description,
+        CreatedAt = DateTime.Now,
+        CategoryId = categoryId,
+        BrandId = brandId,
+        CriticalStockLevel = 10,
+        CreatedBy = deleted.CreatedBy // ✅ Ekleyen kişi korunuyor
+    };
+
+    _context.Product.Add(restoredProduct);
+    _context.DeletedProducts.Remove(deleted);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Ürün başarıyla geri yüklendi." });
+}
+
     }
 }

@@ -11,14 +11,10 @@ import {
   Fade,
 } from "@mui/material";
 import axios from "axios";
-
-const labelSx = {
-  color: "#fff",
-  "&.Mui-focused": { color: "#fff" },
-  "&.MuiInputLabel-shrink": { color: "#fff" },
-};
+import { useTheme } from "@mui/material/styles";
 
 export default function StockMovements() {
+  const theme = useTheme();
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [movements, setMovements] = useState([]);
@@ -137,8 +133,8 @@ export default function StockMovements() {
                 flexDirection: "column",
                 gap: 3,
                 alignItems: "center",
-                bgcolor: "rgba(68, 129, 160, 0)",
-                color: "#fff",
+                bgcolor: "background.paper",
+                color: "text.primary",
               }}
             >
               <Typography variant="h5" fontWeight={700}>
@@ -156,17 +152,16 @@ export default function StockMovements() {
                     option?.id === value?.id
                   }
                   componentsProps={{
-                    paper: { sx: { bgcolor: "#5992cbff", color: "#fff" } },
+                    paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
                   }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Ürün Seçin"
                       fullWidth
-                      InputLabelProps={{ sx: labelSx }}
+                      InputLabelProps={{ sx: { color: "text.primary" } }}
                       sx={{
-                        "& .MuiInputLabel-root": { color: "#fff" },
-                        "& .MuiInputBase-input": { color: "#fff" },
+                        "& .MuiInputBase-input": { color: "text.primary" },
                       }}
                     />
                   )}
@@ -190,16 +185,15 @@ export default function StockMovements() {
                       value={movementType}
                       onChange={(e) => setMovementType(e.target.value)}
                       fullWidth
-                      InputLabelProps={{ sx: labelSx }}
+                      InputLabelProps={{ sx: { color: "text.primary" } }}
                       sx={{
-                        "& .MuiInputLabel-root": { color: "#fff" },
-                        "& .MuiInputBase-input": { color: "#fff" },
+                        "& .MuiInputBase-input": { color: "text.primary" },
                         borderRadius: 2,
                       }}
                       SelectProps={{
                         MenuProps: {
                           PaperProps: {
-                            sx: { bgcolor: "#5992cbff", color: "#fff" },
+                            sx: { bgcolor: "background.paper", color: "text.primary" },
                           },
                         },
                       }}
@@ -214,10 +208,9 @@ export default function StockMovements() {
                       value={quantityChange}
                       onChange={(e) => setQuantityChange(e.target.value)}
                       fullWidth
-                      InputLabelProps={{ sx: labelSx }}
+                      InputLabelProps={{ sx: { color: "text.primary" } }}
                       sx={{
-                        "& .MuiInputLabel-root": { color: "#fff" },
-                        "& .MuiInputBase-input": { color: "#fff" },
+                        "& .MuiInputBase-input": { color: "text.primary" },
                         borderRadius: 2,
                       }}
                       inputProps={{ min: 1 }}
@@ -231,10 +224,10 @@ export default function StockMovements() {
                     onClick={handleAddMovement}
                     fullWidth
                     sx={{
-                      backgroundColor: "rgba(68, 129, 160, 0.3)",
+                      backgroundColor: "primary.main",
                       color: "#fff",
                       "&:hover": {
-                        backgroundColor: "rgba(18, 93, 131, 0.5)",
+                        backgroundColor: "primary.dark",
                       },
                     }}
                   >
@@ -244,20 +237,18 @@ export default function StockMovements() {
                   {/* Hareket Geçmişi */}
                   <Box sx={{ width: { xs: "100%", sm: 400, md: 500 }, mt: 2 }}>
                     <Typography variant="h6" gutterBottom textAlign="center">
-                      <span style={{ color: "#15366b", fontWeight: 700 }}>
+                      <span style={{ fontWeight: 700 }}>
                         {selectedProduct.label}
-                      </span>
-                      <span style={{ color: "#fff", fontWeight: 400 }}>
-                        {" "}
-                        Ürün Hareketleri:
-                      </span>
+                      </span>{" "}
+                      Ürün Hareketleri:
                     </Typography>
                     <Box
                       sx={{
                         p: 2,
-                        border: "1px solid rgba(0,0,0,0.12)",
+                        border: "1px solid",
+                        borderColor: "divider",
                         borderRadius: 2,
-                        bgcolor: "#fff",
+                        bgcolor: "background.default",
                         minHeight: 50,
                       }}
                     >

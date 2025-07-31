@@ -34,6 +34,8 @@ namespace InventoryApi.Models
         [ValidateNever]
         public List<StockMovement> StockMovements { get; set; } = new();
 
+        public string? CreatedBy { get; set; }
+
         public Product()
         {
             CreatedAt = DateTime.Now;

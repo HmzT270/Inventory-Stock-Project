@@ -65,3 +65,4 @@ export const updateProductCategory = async (productId, newCategoryId) => {
     throw error;
   }
 };
+

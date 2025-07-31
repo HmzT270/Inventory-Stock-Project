@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5184/api/Brand';
+const PRODUCT_API_URL = 'http://localhost:5184/api/Product';
 
 // Tüm markaları getir
 export const getAllBrands = async () => {
@@ -33,7 +34,7 @@ export const deleteBrand = async (id) => {
   }
 };
 
-// Marka adını değiştir (Kategori ile aynı mantık)
+// Marka adını değiştir
 export const renameBrand = async (id, newName) => {
   try {
     await axios.put(`${API_URL}/Rename/${id}`, { newName });
@@ -42,3 +43,4 @@ export const renameBrand = async (id, newName) => {
     throw error;
   }
 };
+

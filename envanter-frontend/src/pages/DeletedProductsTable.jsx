@@ -11,11 +11,15 @@ import {
   Paper,
   Grid,
   Button,
+  Alert,
+  Fade,
 } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 
 export default function DeletedProductsTable() {
   const [deletedProducts, setDeletedProducts] = useState([]);
+  const [status, setStatus] = useState({ success: null, message: "" });
+  const [showStatus, setShowStatus] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:5184/api/Product/Last10Deleted")
@@ -29,24 +33,32 @@ export default function DeletedProductsTable() {
         `http://localhost:5184/api/Product/Restore/${originalProductId}`,
         { method: "POST" }
       );
+
       if (response.ok) {
         setDeletedProducts((prev) =>
           prev.filter((p) => p.originalProductId !== originalProductId)
         );
-        alert("Ürün başarıyla geri yüklendi.");
+        showAlert(true, "Ürün başarıyla geri yüklendi.");
       } else {
-        alert("Geri yükleme başarısız.");
+        const errorText = await response.text();
+        showAlert(false, errorText || "Geri yükleme başarısız.");
       }
     } catch (err) {
       console.error(err);
-      alert("Bir hata oluştu.");
+      showAlert(false, "Bir hata oluştu.");
     }
+  };
+
+  const showAlert = (isSuccess, msg) => {
+    setStatus({ success: isSuccess, message: msg });
+    setShowStatus(true);
+    setTimeout(() => setShowStatus(false), 3000);
   };
 
   return (
     <Box
       sx={{
-        minHeight: "80vh",
+        minHeight: "90vh",
         width: "100%",
         display: "flex",
         alignItems: "center",
@@ -68,7 +80,7 @@ export default function DeletedProductsTable() {
               variant="h5"
               fontWeight="bold"
               mb={3}
-              color="#ffffff"
+              color="text.primary"
               sx={{ textAlign: "center", width: "100%" }}
             >
               Silinen Son 10 Ürün
@@ -77,7 +89,7 @@ export default function DeletedProductsTable() {
             <TableContainer
               component={Paper}
               sx={{
-                backgroundColor: "rgba(16, 132, 199, 0)",
+                backgroundColor: "background.default",
                 width: "100%",
                 boxSizing: "border-box",
                 overflowX: "auto",
@@ -85,7 +97,7 @@ export default function DeletedProductsTable() {
             >
               <Table size="small" sx={{ width: "100%", tableLayout: "fixed" }}>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: "#6baee8ff" }}>
+                  <TableRow sx={{ backgroundColor: "background.paper" }}>
                     <TableCell sx={cellHeaderStyle()}>Adı</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Stok</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Kategori</TableCell>
@@ -93,6 +105,7 @@ export default function DeletedProductsTable() {
                     <TableCell sx={cellHeaderStyle()}>Ürün ID</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Açıklama</TableCell>
                     <TableCell sx={cellHeaderStyle()}>Silinme Tarihi</TableCell>
+                    <TableCell sx={cellHeaderStyle()}>Silen Kişi</TableCell>
                     <TableCell sx={cellHeaderStyle()} align="center">
                       İşlem
                     </TableCell>
@@ -119,6 +132,9 @@ export default function DeletedProductsTable() {
                         {p.deletedAt &&
                           new Date(p.deletedAt).toLocaleString("tr-TR")}
                       </TableCell>
+                      <TableCell sx={cellBodyStyle()}>
+                        {p.deletedBy || "—"}
+                      </TableCell>
                       <TableCell sx={cellBodyStyle()} align="center">
                         <Button
                           variant="contained"
@@ -134,9 +150,9 @@ export default function DeletedProductsTable() {
                   {deletedProducts.length === 0 && (
                     <TableRow>
                       <TableCell
-                        colSpan={8}
+                        colSpan={9}
                         align="center"
-                        sx={{ color: "#ffffff" }}
+                        sx={{ color: "text.primary" }}
                       >
                         Silinen ürün yok.
                       </TableCell>
@@ -145,6 +161,22 @@ export default function DeletedProductsTable() {
                 </TableBody>
               </Table>
             </TableContainer>
+
+            {/* Fade uyarı mesajı tablonun altında */}
+            <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+              <Fade in={showStatus} timeout={1500}>
+                <Alert
+                  severity={status.success ? "success" : "error"}
+                  sx={{
+                    fontWeight: "bold",
+                    minWidth: 300,
+                    textAlign: "center",
+                  }}
+                >
+                  {status.message}
+                </Alert>
+              </Fade>
+            </Box>
           </Grid>
         </Grid>
       </Box>
@@ -153,7 +185,7 @@ export default function DeletedProductsTable() {
 }
 
 const cellHeaderStyle = () => ({
-  color: "#ffffffff",
+  color: "text.primary",
   fontWeight: "bold",
   fontSize: { xs: 13, md: 16 },
   whiteSpace: "normal",
@@ -161,7 +193,7 @@ const cellHeaderStyle = () => ({
 });
 
 const cellBodyStyle = () => ({
-  color: "#ffffff",
+  color: "text.primary",
   fontWeight: "bold",
   fontSize: { xs: 13, md: 15 },
   whiteSpace: "normal",

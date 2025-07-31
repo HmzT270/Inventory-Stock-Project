@@ -81,14 +81,14 @@ export default function Home() {
       >
         <Typography
           variant="h4"
-          color="#fff"
+          color="text.primary"
           fontWeight={700}
           gutterBottom
           textAlign="center"
         >
           Hoş geldiniz!
         </Typography>
-        <Typography color="#fff" fontSize={18} mb={3} textAlign="center">
+        <Typography color="text.primary" fontSize={18} mb={3} textAlign="center">
           Envanter ve stok takibinizi kolayca yönetin.
         </Typography>
 
@@ -107,38 +107,38 @@ export default function Home() {
               icon: <InventoryIcon fontSize="large" />,
               label: "Toplam Ürün",
               value: productCount,
-              bg: "#15366b",
+              bg: "background.paper",
             },
             {
               icon: <CategoryIcon fontSize="large" />,
               label: "Kategori",
               value: categoryCount,
-              bg: "#21598b",
+              bg: "background.paper",
             },
             {
               icon: <StoreIcon fontSize="large" />,
               label: "Marka",
               value: brandCount,
-              bg: "#146c43",
+              bg: "background.paper",
             },
             {
               icon: <WarningIcon fontSize="large" />,
               label: "Kritik Stok",
               value: criticalCount,
-              bg: "#99262d",
+              bg: "background.paper",
             },
             {
               icon: <BlockIcon fontSize="large" />,
               label: "Stokta Yok",
               value: outOfStockCount,
-              bg: "#d32f2f",
+              bg: "background.paper",
             },
           ].map((item, i) => (
             <Card
               key={i}
               sx={{
                 bgcolor: item.bg,
-                color: "#fff",
+                color: "text.primary",
                 borderRadius: 3,
                 boxShadow: 2,
                 width: { xs: "48%", sm: "30%", md: "18%" },
@@ -149,10 +149,12 @@ export default function Home() {
                 <Stack direction="row" spacing={2} alignItems="center">
                   {item.icon}
                   <Box>
-                    <Typography fontWeight={700} fontSize={18}>
+                    <Typography fontWeight={700} fontSize={18} color="text.primary">
                       {item.value}
                     </Typography>
-                    <Typography fontSize={15}>{item.label}</Typography>
+                    <Typography fontSize={15} color="text.primary">
+                      {item.label}
+                    </Typography>
                   </Box>
                 </Stack>
               </CardContent>
@@ -160,7 +162,7 @@ export default function Home() {
           ))}
         </Box>
 
-        {/* Son Eklenen ve Son Silinen Ürün Kartları Yan Yana */}
+        {/* Son Eklenen ve Son Silinen Ürün Kartları */}
         {(lastProduct || lastDeleted) && (
           <Box
             sx={{
@@ -172,26 +174,25 @@ export default function Home() {
               mb: 3,
             }}
           >
-            {/* Son Eklenen Ürün */}
             {lastProduct && (
               <Box
                 sx={{
                   flex: "1 1 300px",
                   maxWidth: 600,
-                  backgroundColor: "rgba(16, 132, 199, 0)",
+                  backgroundColor: "background.paper",
                   borderRadius: 2,
                   p: 3,
-                  color: "#fff",
+                  color: "text.primary",
                   boxShadow: 2,
                 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center" mb={2}>
-                  <Typography fontWeight={800} fontSize={22}>
+                  <Typography fontWeight={800} fontSize={22} color="text.primary">
                     Son Eklenen Ürün
                   </Typography>
                   <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
                 </Stack>
-                <Typography sx={{ lineHeight: 2 }}>
+                <Typography sx={{ lineHeight: 2 }} color="text.primary">
                   <b>Ürün Adı:</b> {lastProduct.name} <br />
                   <b>Stok:</b> {lastProduct.quantity} <br />
                   <b>Kategori:</b> {lastProduct.category || "Bilinmiyor"} <br />
@@ -204,26 +205,25 @@ export default function Home() {
               </Box>
             )}
 
-            {/* Son Silinen Ürün */}
             {lastDeleted && (
               <Box
                 sx={{
                   flex: "1 1 300px",
                   maxWidth: 600,
-                  backgroundColor: "rgba(16, 132, 199, 0)",
+                  backgroundColor: "background.paper",
                   borderRadius: 2,
                   p: 3,
-                  color: "#fff",
+                  color: "text.primary",
                   boxShadow: 2,
                 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center" mb={2}>
-                  <Typography fontWeight={800} fontSize={22}>
+                  <Typography fontWeight={800} fontSize={22} color="text.primary">
                     Son Silinen Ürün
                   </Typography>
                   <DeleteOutlineIcon sx={{ fontSize: 28 }} />
                 </Stack>
-                <Typography sx={{ lineHeight: 2 }}>
+                <Typography sx={{ lineHeight: 2 }} color="text.primary">
                   <b>Ürün Adı:</b> {lastDeleted.name} <br />
                   <b>Stok:</b> {lastDeleted.quantity} <br />
                   <b>Kategori:</b>{" "}

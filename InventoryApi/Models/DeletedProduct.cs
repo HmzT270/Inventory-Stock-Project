@@ -18,6 +18,10 @@ namespace InventoryApi.Models
 
         public string? CategoryName { get; set; }
 
-        public string? Brand { get; set; } // ✅ Marka bilgisi eklendi
+        public string? Brand { get; set; } // ✅ Marka bilgisi
+
+        public string? DeletedBy { get; set; }  // Silen kullanıcı
+
+        public string? CreatedBy { get; set; }  // ✅ Ekleyen kullanıcı (yeni)
     }
 }

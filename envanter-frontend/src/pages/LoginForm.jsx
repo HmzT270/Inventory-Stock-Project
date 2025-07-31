@@ -1,4 +1,11 @@
 import React, { useState } from "react";
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button
+} from "@mui/material";
 
 export default function LoginForm({ onLogin, onSwitchToRegister }) {
   const [username, setUsername] = useState("");
@@ -8,7 +15,9 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find(
+      (u) => u.username === username && u.password === password
+    );
 
     if (!user) {
       setError("Kullanıcı adı veya parola yanlış!");
@@ -25,30 +34,76 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "auto", padding: 20 }}>
-      <h2>Giriş Yap</h2>
-      <input
-        type="text"
-        placeholder="Kullanıcı Adı"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-        style={{ width: "100%", padding: 8, marginBottom: 10 }}
-      />
-      <input
-        type="password"
-        placeholder="Parola"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        style={{ width: "100%", padding: 8, marginBottom: 10 }}
-      />
-      <button type="submit" style={{ width: "100%", padding: 10 }}>Giriş</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <p style={{ marginTop: 15 }}>
-        Üye değil misiniz?{" "}
-        <button type="button" onClick={onSwitchToRegister} style={{ color: "blue", cursor: "pointer", border: "none", background: "none", padding: 0 }}>
-          Kayıt Ol
-        </button>
-      </p>
-    </form>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",   // yatay ortalama
+        alignItems: "flex-start",    // üste hizalama
+        pt: "10vh",                  // yukarıdan boşluk
+        bgcolor: "background.default",
+      }}
+    >
+      <Paper
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{
+          p: 4,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          width: 350,
+          bgcolor: "background.paper",
+          boxShadow: 3,
+          borderRadius: 2,
+        }}
+      >
+        <Typography variant="h6" align="center" fontWeight={700}>
+          Giriş Yap
+        </Typography>
+
+        <TextField
+          label="Kullanıcı Adı"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          fullWidth
+        />
+
+        <TextField
+          label="Parola"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          fullWidth
+        />
+
+        <Button type="submit" variant="contained" fullWidth>
+          GİRİŞ
+        </Button>
+
+        {error && (
+          <Typography color="error" textAlign="center" fontSize={14}>
+            {error}
+          </Typography>
+        )}
+
+        <Typography variant="body2" align="center">
+          Üye değil misiniz?{" "}
+          <Button
+            type="button"
+            onClick={onSwitchToRegister}
+            sx={{
+              color: "primary.main",
+              fontWeight: 600,
+              textTransform: "none",
+              p: 0,
+            }}
+          >
+            Kayıt Ol
+          </Button>
+        </Typography>
+      </Paper>
+    </Box>
   );
 }

@@ -31,6 +31,9 @@ function ProductManagement() {
   const [showAddStatus, setShowAddStatus] = useState(false);
   const [showDeleteStatus, setShowDeleteStatus] = useState(false);
 
+  // Giriş yapan kullanıcı
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
   useEffect(() => {
     fetch("http://localhost:5184/api/Category")
       .then((res) => res.json())
@@ -67,6 +70,9 @@ function ProductManagement() {
       });
       return;
     }
+
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
     try {
       const res = await fetch("http://localhost:5184/api/Product", {
         method: "POST",
@@ -77,8 +83,10 @@ function ProductManagement() {
           categoryId: selectedCategory.categoryId,
           brandId: selectedBrand.brandId,
           description: description.trim() === "" ? null : description,
+          createdBy: currentUser?.username || "Bilinmiyor",
         }),
       });
+
       if (res.ok) {
         setProductName("");
         setQuantity(0);
@@ -116,19 +124,40 @@ function ProductManagement() {
       });
       return;
     }
+
+    if (!currentUser) {
+      showTemporaryMessage(setStatusDelete, setShowDeleteStatus, {
+        success: false,
+        message: "Kullanıcı oturumu bulunamadı.",
+      });
+      return;
+    }
+
     try {
-      await fetch(
+      const response = await fetch(
         `http://localhost:5184/api/Product/${selectedProduct.productId}`,
         {
           method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            deletedBy: currentUser.username, // Silen kullanıcı
+          }),
         }
       );
-      setDeleteInput("");
-      setSelectedProduct(null);
-      showTemporaryMessage(setStatusDelete, setShowDeleteStatus, {
-        success: true,
-        message: "Ürün silindi!",
-      });
+
+      if (response.ok) {
+        setDeleteInput("");
+        setSelectedProduct(null);
+        showTemporaryMessage(setStatusDelete, setShowDeleteStatus, {
+          success: true,
+          message: "Ürün silindi!",
+        });
+      } else {
+        showTemporaryMessage(setStatusDelete, setShowDeleteStatus, {
+          success: false,
+          message: "Ürün silinemedi.",
+        });
+      }
     } catch {
       showTemporaryMessage(setStatusDelete, setShowDeleteStatus, {
         success: false,
@@ -138,9 +167,9 @@ function ProductManagement() {
   };
 
   const labelSx = {
-    color: "#fff",
-    "&.Mui-focused": { color: "#ffffff" },
-    "&.MuiInputLabel-shrink": { color: "#ffffff" },
+    color: "text.primary",
+    "&.Mui-focused": { color: "text.primary" },
+    "&.MuiInputLabel-shrink": { color: "text.primary" },
   };
 
   return (
@@ -162,10 +191,10 @@ function ProductManagement() {
           <Paper
             sx={{
               width: 360,
-              height: 460,
+              height: 505,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#ffffff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -180,7 +209,7 @@ function ProductManagement() {
               fullWidth
               sx={{ mb: 2.5 }}
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#ffffff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
             />
             <Autocomplete
               options={categories}
@@ -188,7 +217,7 @@ function ProductManagement() {
               value={selectedCategory}
               onChange={(e, val) => setSelectedCategory(val)}
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#ffffff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -197,9 +226,9 @@ function ProductManagement() {
                   fullWidth
                   sx={{ mb: 2.5 }}
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#ffffff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                 />
               )}
@@ -210,7 +239,7 @@ function ProductManagement() {
               value={selectedBrand}
               onChange={(e, val) => setSelectedBrand(val)}
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#ffffff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -219,9 +248,9 @@ function ProductManagement() {
                   fullWidth
                   sx={{ mb: 2.5 }}
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#ffffff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                 />
               )}
@@ -231,11 +260,10 @@ function ProductManagement() {
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              inputProps={{ min: 0 }}
               fullWidth
               sx={{ mb: 2.5 }}
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#ffffff" } }}
+              inputProps={{ min: 0, style: { color: "text.primary" } }}
             />
             <TextField
               label="Açıklama (Opsiyonel)"
@@ -244,7 +272,7 @@ function ProductManagement() {
               fullWidth
               sx={{ mb: 2.5 }}
               InputLabelProps={{ sx: labelSx }}
-              InputProps={{ style: { color: "#ffffff" } }}
+              inputProps={{ style: { color: "text.primary" } }}
             />
             <Button
               variant="contained"
@@ -252,7 +280,7 @@ function ProductManagement() {
               fullWidth
               sx={{
                 backgroundColor: "rgba(68, 129, 160, 0.5)",
-                color: "#ffffff",
+                color: "#fff",
                 "&:hover": { backgroundColor: "rgba(18, 93, 131, 0.5)" },
               }}
             >
@@ -277,10 +305,10 @@ function ProductManagement() {
           <Paper
             sx={{
               width: 360,
-              height: 160,
+              height: 202,
               p: 3,
-              bgcolor: "rgba(68, 129, 160, 0)",
-              color: "#ffffff",
+              bgcolor: "background.default",
+              color: "text.primary",
               borderRadius: 3,
               boxShadow: 2,
             }}
@@ -295,7 +323,7 @@ function ProductManagement() {
               onInputChange={handleDeleteInputChange}
               onChange={(e, value) => setSelectedProduct(value)}
               componentsProps={{
-                paper: { sx: { bgcolor: "#5992cbff", color: "#ffffff" } },
+                paper: { sx: { bgcolor: "background.paper", color: "text.primary" } },
               }}
               renderInput={(params) => (
                 <TextField
@@ -304,9 +332,9 @@ function ProductManagement() {
                   fullWidth
                   sx={{ mb: 2.5 }}
                   InputLabelProps={{ sx: labelSx }}
-                  InputProps={{
-                    ...params.InputProps,
-                    style: { color: "#ffffff" },
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { color: "text.primary" },
                   }}
                 />
               )}
@@ -318,7 +346,7 @@ function ProductManagement() {
               fullWidth
               sx={{
                 backgroundColor: "rgba(199,36,36,0.5)",
-                color: "#ffffff",
+                color: "#fff",
                 "&:hover": { backgroundColor: "rgba(255,59,59,0.6)" },
               }}
             >
