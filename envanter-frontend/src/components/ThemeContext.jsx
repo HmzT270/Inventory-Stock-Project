@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import { GlobalStyles } from "@mui/material";
 
 const ThemeContext = createContext();
 
@@ -93,6 +94,18 @@ export const ThemeContextProvider = ({ children }) => {
     <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <GlobalStyles
+          styles={{
+            ":root": {
+              colorScheme: darkMode ? "light dark" : "light", // 🎯 color-scheme buraya eklendi
+            },
+            // DataGrid başlık, iç satır ve hücreler için animasyon
+            ".MuiDataGrid-columnHeaders, .MuiDataGrid-footerContainer, .MuiTableHead-root, .MuiTableRow-root, .MuiDataGrid-columnHeadersInner, .MuiDataGrid-columnHeader, .MuiDataGrid-cell, .MuiTableCell-root":
+              {
+                transition: "background-color 0.6s ease, color 0.6s ease",
+              },
+          }}
+        />
         {children}
       </ThemeProvider>
     </ThemeContext.Provider>

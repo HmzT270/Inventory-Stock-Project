@@ -200,7 +200,8 @@ export default function Home() {
                   <b>Açıklama:</b>{" "}
                   {lastProduct.description?.trim() || "Yok"} <br />
                   <b>Eklenme Tarihi:</b>{" "}
-                  {new Date(lastProduct.createdAt).toLocaleString("tr-TR")}
+                  {new Date(lastProduct.createdAt).toLocaleString("tr-TR")} <br />
+                  <b>Ekleyen:</b> {lastProduct.createdBy || "Bilinmiyor"}
                 </Typography>
               </Box>
             )}
@@ -237,7 +238,8 @@ export default function Home() {
                   <b>Silinme Tarihi:</b>{" "}
                   {lastDeleted.deletedAt
                     ? new Date(lastDeleted.deletedAt).toLocaleString("tr-TR")
-                    : ""}
+                    : ""} <br />
+                  <b>Silen:</b> {lastDeleted.deletedBy || "Bilinmiyor"}
                 </Typography>
               </Box>
             )}

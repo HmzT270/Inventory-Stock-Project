@@ -85,7 +85,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
           width: 360,
           p: 4,
           borderRadius: 3,
-          bgcolor: "background.paper",
+          bgcolor: "background.default",
           color: "text.primary",
           boxShadow: 3,
         }}

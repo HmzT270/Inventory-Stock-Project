@@ -247,7 +247,7 @@ export default function ProductEdit() {
                 onClick={handleRename}
                 sx={{
                   flex: 1,
-                  backgroundColor: "rgba(68, 129, 160, 0.3)",
+                  backgroundColor: "rgba(68, 129, 160, 0.5)",
                   color: "#fff",
                   "&:hover": { backgroundColor: "rgba(18, 93, 131, 0.5)" },
                 }}
@@ -259,7 +259,7 @@ export default function ProductEdit() {
                 onClick={handleCategoryChange}
                 sx={{
                   flex: 1,
-                  backgroundColor: "rgba(68, 129, 160, 0.3)",
+                  backgroundColor: "rgba(68, 129, 160, 0.5)",
                   color: "#fff",
                   "&:hover": { backgroundColor: "rgba(18, 93, 131, 0.5)" },
                 }}
@@ -340,7 +340,7 @@ export default function ProductEdit() {
               onClick={handleDescriptionUpdate}
               fullWidth
               sx={{
-                backgroundColor: "rgba(68, 129, 160, 0.3)",
+                backgroundColor: "rgba(68, 129, 160, 0.5)",
                 color: "#fff",
                 "&:hover": { backgroundColor: "rgba(18, 93, 131, 0.5)" },
               }}
