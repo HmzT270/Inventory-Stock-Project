@@ -4,6 +4,7 @@ using InventoryApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventoryApi.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    partial class InventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250801231726_AddIsFavoriteToProducts")]
+    partial class AddIsFavoriteToProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,28 +145,6 @@ namespace InventoryApi.Migrations
                     b.ToTable("Product");
                 });
 
-            modelBuilder.Entity("InventoryApi.Models.ProductFavorite", b =>
-                {
-                    b.Property<int>("ProductFavoriteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductFavoriteId"));
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProductFavoriteId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductFavorites");
-                });
-
             modelBuilder.Entity("InventoryApi.Models.StockMovement", b =>
                 {
                     b.Property<int>("MovementId")
@@ -207,17 +188,6 @@ namespace InventoryApi.Migrations
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("InventoryApi.Models.ProductFavorite", b =>
-                {
-                    b.HasOne("InventoryApi.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("InventoryApi.Models.StockMovement", b =>

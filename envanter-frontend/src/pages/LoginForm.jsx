@@ -24,12 +24,16 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
       return;
     }
 
+    // ✅ Kullanıcı adını LocalStorage'a kaydet
+    localStorage.setItem("username", user.username);
+
     // SESSION KEY işlemi (her sekme ayrı sessionKey alacak)
     const sessionKey = Math.random().toString(36).substring(2);
     localStorage.setItem("currentUser", JSON.stringify(user));
     localStorage.setItem("sessionKey", sessionKey);
     window.sessionStorage.setItem("activeSessionKey", sessionKey);
 
+    // ✅ Login callback
     onLogin(user.role, user.username);
   };
 

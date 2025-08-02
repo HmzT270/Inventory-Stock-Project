@@ -76,14 +76,26 @@ namespace InventoryApi.Controllers
         }
 
         [HttpGet("Sorted")]
-        public async Task<ActionResult<IEnumerable<object>>> GetSortedProducts([FromQuery] string orderBy = "serialnumber", [FromQuery] string direction = "asc")
+        public async Task<ActionResult<IEnumerable<object>>> GetSortedProducts(
+            [FromQuery] string orderBy = "serialnumber",
+            [FromQuery] string direction = "asc",
+            [FromQuery] string userId = ""
+        )
         {
+            // 1️⃣ Tüm ürünleri ilişkileriyle birlikte çek
             var products = await _context.Product
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
                 .Include(p => p.StockMovements)
                 .ToListAsync();
 
+            // 2️⃣ Kullanıcıya ait favori ürünleri tek seferde al (performanslı)
+            var userFavorites = _context.ProductFavorites
+                .Where(f => f.UserId == userId)
+                .Select(f => f.ProductId)
+                .ToHashSet();
+
+            // 3️⃣ Ürünleri map'le ve kullanıcıya özel IsFavorite ekle
             var sorted = products.Select((p, i) => new
             {
                 SerialNumber = i + 1,
@@ -95,12 +107,17 @@ namespace InventoryApi.Controllers
                 p.CreatedAt,
                 p.CriticalStockLevel,
                 p.CreatedBy,
+
+                // ⭐ Kullanıcıya özel favori bilgisi
+                IsFavorite = userFavorites.Contains(p.ProductId),
+
                 Category = p.Category?.Name ?? "",
                 Brand = p.Brand?.Name ?? "",
                 BrandId = p.BrandId,
                 StockMovementCount = p.StockMovements?.Count ?? 0
             });
 
+            // 4️⃣ Sıralama
             sorted = (orderBy.ToLower(), direction.ToLower()) switch
             {
                 ("name", "asc") => sorted.OrderBy(p => p.Name),
@@ -120,6 +137,8 @@ namespace InventoryApi.Controllers
 
             return Ok(sorted.ToList());
         }
+
+
 
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(ProductCreateDto dto)
@@ -251,30 +270,30 @@ namespace InventoryApi.Controllers
         }
 
         // ✅ Belirli bir markaya ait tüm ürünleri getir
-[HttpGet("ByBrand/{brandId}")]
-public async Task<ActionResult<IEnumerable<object>>> GetProductsByBrand(int brandId)
-{
-    var products = await _context.Product
-        .Where(p => p.BrandId == brandId)
-        .Include(p => p.Category)
-        .Include(p => p.Brand)
-        .Include(p => p.StockMovements)
-        .ToListAsync();
+        [HttpGet("ByBrand/{brandId}")]
+        public async Task<ActionResult<IEnumerable<object>>> GetProductsByBrand(int brandId)
+        {
+            var products = await _context.Product
+                .Where(p => p.BrandId == brandId)
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Include(p => p.StockMovements)
+                .ToListAsync();
 
-    return Ok(products.Select(p => new
-    {
-        p.ProductId,
-        p.Name,
-        p.Quantity,
-        p.Description,
-        p.CreatedAt,
-        p.CriticalStockLevel,
-        p.CreatedBy,
-        Category = p.Category?.Name,
-        Brand = p.Brand?.Name,
-        StockMovementCount = p.StockMovements?.Count ?? 0
-    }));
-}
+            return Ok(products.Select(p => new
+            {
+                p.ProductId,
+                p.Name,
+                p.Quantity,
+                p.Description,
+                p.CreatedAt,
+                p.CriticalStockLevel,
+                p.CreatedBy,
+                Category = p.Category?.Name,
+                Brand = p.Brand?.Name,
+                StockMovementCount = p.StockMovements?.Count ?? 0
+            }));
+        }
 
 
         [HttpGet("SearchByName/{query}")]
@@ -372,56 +391,114 @@ public async Task<ActionResult<IEnumerable<object>>> GetProductsByBrand(int bran
         }
 
         [HttpPost("Restore/{originalProductId}")]
-public async Task<IActionResult> RestoreProduct(int originalProductId)
-{
-    var deleted = await _context.DeletedProducts
-        .FirstOrDefaultAsync(d => d.OriginalProductId == originalProductId);
+        public async Task<IActionResult> RestoreProduct(int originalProductId)
+        {
+            var deleted = await _context.DeletedProducts
+                .FirstOrDefaultAsync(d => d.OriginalProductId == originalProductId);
 
-    if (deleted == null) return NotFound("Silinen ürün bulunamadı.");
+            if (deleted == null) return NotFound("Silinen ürün bulunamadı.");
 
-    // Kategori kontrolü
-    var categoryId = await _context.Categories
-        .Where(c => c.Name == deleted.CategoryName)
-        .Select(c => c.CategoryId)
-        .FirstOrDefaultAsync();
+            // Kategori kontrolü
+            var categoryId = await _context.Categories
+                .Where(c => c.Name == deleted.CategoryName)
+                .Select(c => c.CategoryId)
+                .FirstOrDefaultAsync();
 
-    if (categoryId == 0)
-        return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu kategori artık mevcut değil.");
+            if (categoryId == 0)
+                return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu kategori artık mevcut değil.");
 
-    // Marka kontrolü (varsa)
-    int? brandId = null;
-    if (!string.IsNullOrEmpty(deleted.Brand))
-    {
-        brandId = await _context.Brands
-            .Where(b => b.Name == deleted.Brand)
-            .Select(b => b.BrandId)
-            .FirstOrDefaultAsync();
+            // Marka kontrolü (varsa)
+            int? brandId = null;
+            if (!string.IsNullOrEmpty(deleted.Brand))
+            {
+                brandId = await _context.Brands
+                    .Where(b => b.Name == deleted.Brand)
+                    .Select(b => b.BrandId)
+                    .FirstOrDefaultAsync();
 
-        if (brandId == 0)
-            return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu marka artık mevcut değil.");
+                if (brandId == 0)
+                    return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu marka artık mevcut değil.");
 
-        // brandId = 0 döndüyse null yapalım
-        if (brandId == 0) brandId = null;
-    }
+                // brandId = 0 döndüyse null yapalım
+                if (brandId == 0) brandId = null;
+            }
 
-    var restoredProduct = new Product
-    {
-        Name = deleted.Name,
-        Quantity = deleted.Quantity,
-        Description = deleted.Description,
-        CreatedAt = DateTime.Now,
-        CategoryId = categoryId,
-        BrandId = brandId,
-        CriticalStockLevel = 10,
-        CreatedBy = deleted.CreatedBy // ✅ Ekleyen kişi korunuyor
-    };
+            var restoredProduct = new Product
+            {
+                Name = deleted.Name,
+                Quantity = deleted.Quantity,
+                Description = deleted.Description,
+                CreatedAt = DateTime.Now,
+                CategoryId = categoryId,
+                BrandId = brandId,
+                CriticalStockLevel = 10,
+                CreatedBy = deleted.CreatedBy // ✅ Ekleyen kişi korunuyor
+            };
 
-    _context.Product.Add(restoredProduct);
-    _context.DeletedProducts.Remove(deleted);
-    await _context.SaveChangesAsync();
+            _context.Product.Add(restoredProduct);
+            _context.DeletedProducts.Remove(deleted);
+            await _context.SaveChangesAsync();
 
-    return Ok(new { message = "Ürün başarıyla geri yüklendi." });
-}
+            return Ok(new { message = "Ürün başarıyla geri yüklendi." });
+        }
+
+        // Favori durumunu değiştirme (toggle)
+        [HttpPut("ToggleFavorite/{id}")]
+        public async Task<IActionResult> ToggleFavorite(int id, [FromQuery] string userId)
+        {
+            Console.WriteLine($"ToggleFavorite => ProductId: {id}, UserId: {userId}");
+
+            // ❌ Kullanıcı boş, whitespace veya "null" string ise favori kaydı oluşturma
+            if (string.IsNullOrWhiteSpace(userId) || userId.Trim().ToLower() == "null")
+            {
+                return BadRequest(new { success = false, message = "Kullanıcı bulunamadı." });
+            }
+
+            // Kullanıcıya özel favori kaydı kontrolü
+            var favorite = await _context.ProductFavorites
+                .FirstOrDefaultAsync(f => f.ProductId == id && f.UserId == userId);
+
+            if (favorite == null)
+            {
+                // ✅ Favori ekle
+                _context.ProductFavorites.Add(new ProductFavorite
+                {
+                    ProductId = id,
+                    UserId = userId
+                });
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, isFavorite = true });
+            }
+            else
+            {
+                // ✅ Favoriyi kaldır
+                _context.ProductFavorites.Remove(favorite);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { success = true, isFavorite = false });
+            }
+        }
+
+
+
+        [HttpDelete("ClearFavorites")]
+        public async Task<IActionResult> ClearFavorites([FromQuery] string userId)
+        {
+            // Bu kullanıcının tüm favorilerini bul
+            var favorites = _context.ProductFavorites
+                .Where(f => f.UserId == userId);
+
+            if (!favorites.Any())
+            {
+                return Ok(new { success = false, message = "Bu kullanıcının favorisi yok." });
+            }
+
+            _context.ProductFavorites.RemoveRange(favorites);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Tüm favoriler kaldırıldı." });
+        }
 
     }
 }

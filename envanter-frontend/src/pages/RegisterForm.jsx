@@ -55,7 +55,10 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
 
-    // Session key işlemi
+    // ✅ Kullanıcı adını LocalStorage'a kaydet
+    localStorage.setItem("username", newUser.username);
+
+    // SESSION KEY işlemi
     const sessionKey = Math.random().toString(36).substring(2);
     localStorage.setItem("currentUser", JSON.stringify(newUser));
     localStorage.setItem("sessionKey", sessionKey);

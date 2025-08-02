@@ -36,6 +36,8 @@ namespace InventoryApi.Models
 
         public string? CreatedBy { get; set; }
 
+        public bool IsFavorite { get; set; } = false;
+
         public Product()
         {
             CreatedAt = DateTime.Now;
