@@ -31,6 +31,7 @@ inventory-stock-system/
 ### 🔷 Backend (API) çalıştırmak için:
 ```bash
 cd InventoryApi
+dotnet restore
 dotnet run  # API http://localhost:5184 üzerinden çalışır
 ```
 
@@ -64,7 +65,7 @@ Başka bir kullanıcı bu projeyi kendi bilgisayarına indirip aşağıdaki adı
 cd inventory-stock-system/InventoryApi
 ```
 
-2. **appsettings.json içindeki bağlantı cümlesini kendi bilgisayarınıza göre düzenleyin:**
+2. **appsettings.json içindeki database adını istediğiniz şekilde düzenleyin veya 'Deneme' olarak bırakın**
 ```json
 "ConnectionStrings": {
   "DefaultConnection": "Server=localhost\SQLEXPRESS;Database=Deneme;Trusted_Connection=True;"
@@ -73,10 +74,13 @@ cd inventory-stock-system/InventoryApi
 
 3. **Aşağıdaki komutla veritabanını oluşturun:**
 ```bash
-dotnet ef database update
+dotnet tool install --global dotnet-ef # Dotnet EF araçlarını global olarak yükle
+dotnet ef database update # Veri tabanını güncelle
 ```
 
 > Bu işlem, veritabanını `Migrations/` klasöründeki tanımlara göre sıfırdan oluşturur.
+> Migrationları veri tabanınıza ekledikten sonra vs code üzerinden connect diyerek bağlanın.
+> Örnek veriler için örnek olarak verilen InventoryDb_FullScricpt.sql dosyasındaki insert komutlarını veri tabanınızda çalıştırın
 
 ---
 
