@@ -1,16 +1,18 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button
-} from "@mui/material";
+import { Box, Paper, Typography, TextField, Button } from "@mui/material";
 
-export default function LoginForm({ onLogin, onSwitchToRegister }) {
+export default function LoginForm({
+  onLogin,
+  onSwitchToRegister,
+  onSwitchToChangePassword,
+  onSwitchToForgotPassword,
+}) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,20}$/;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,14 +22,22 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
     );
 
     if (!user) {
-      setError("Kullanıcı adı veya parola yanlış!");
+      setError("❌ Kullanıcı adı veya parola yanlış!");
       return;
     }
 
-    // ✅ Kullanıcı adını LocalStorage'a kaydet
+    // ✅ Şifre karmaşıklık kontrolü
+    if (!passwordRegex.test(password)) {
+      setError(
+        "❌ Parola 6-20 karakter olmalı, en az 1 büyük, 1 küçük, 1 rakam ve 1 özel karakter içermeli!"
+      );
+      return;
+    }
+
+    // ✅ Kullanıcıyı LocalStorage'a kaydet
     localStorage.setItem("username", user.username);
 
-    // SESSION KEY işlemi (her sekme ayrı sessionKey alacak)
+    // SESSION KEY işlemi
     const sessionKey = Math.random().toString(36).substring(2);
     localStorage.setItem("currentUser", JSON.stringify(user));
     localStorage.setItem("sessionKey", sessionKey);
@@ -43,9 +53,9 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
         minHeight: "100vh",
         width: "100%",
         display: "flex",
-        justifyContent: "center",   // yatay ortalama
-        alignItems: "flex-start",    // üste hizalama
-        pt: "10vh",                  // yukarıdan boşluk
+        justifyContent: "center",
+        alignItems: "flex-start",
+        pt: "10vh",
         bgcolor: "background.default",
       }}
     >
@@ -72,6 +82,7 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           fullWidth
+          autoComplete="off"
         />
 
         <TextField
@@ -80,6 +91,7 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           fullWidth
+          autoComplete="new-password"
         />
 
         <Button type="submit" variant="contained" fullWidth>
@@ -92,8 +104,8 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
           </Typography>
         )}
 
-        <Typography variant="body2" align="center">
-          Üye değil misiniz?{" "}
+        <Typography variant="body2" align="center" sx={{ mt: 1 }}>
+          Üye Olmak İçin:{" "}
           <Button
             type="button"
             onClick={onSwitchToRegister}
@@ -105,6 +117,38 @@ export default function LoginForm({ onLogin, onSwitchToRegister }) {
             }}
           >
             Kayıt Ol
+          </Button>
+        </Typography>
+
+        <Typography variant="body2" align="center" sx={{ mt: 1 }}>
+          Şifrenizi Değiştirmek İçin:{" "}
+          <Button
+            type="button"
+            onClick={onSwitchToChangePassword}
+            sx={{
+              color: "primary.main",
+              fontWeight: 600,
+              textTransform: "none",
+              p: 0,
+            }}
+          >
+            Şifre Değiştir
+          </Button>
+        </Typography>
+
+        <Typography variant="body2" align="center" sx={{ mt: 1 }}>
+          Şifre Sıfırlamak İçin:{" "}
+          <Button
+            type="button"
+            onClick={onSwitchToForgotPassword}
+            sx={{
+              color: "primary.main",
+              fontWeight: 600,
+              textTransform: "none",
+              p: 0,
+            }}
+          >
+            Şifremi Unuttum
           </Button>
         </Typography>
       </Paper>

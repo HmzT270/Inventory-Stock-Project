@@ -14,6 +14,5 @@ namespace InventoryApi.Data
         public DbSet<Brand> Brands { get; set; } // <-- EKLENDİ!
         public DbSet<ProductFavorite> ProductFavorites { get; set; }
 
-        
     }
 }

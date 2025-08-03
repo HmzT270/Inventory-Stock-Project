@@ -499,6 +499,5 @@ namespace InventoryApi.Controllers
 
             return Ok(new { success = true, message = "Tüm favoriler kaldırıldı." });
         }
-
     }
 }

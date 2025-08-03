@@ -36,7 +36,7 @@ namespace InventoryApi.Migrations
 
                     b.HasKey("BrandId");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("InventoryApi.Models.Category", b =>
@@ -53,7 +53,7 @@ namespace InventoryApi.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("InventoryApi.Models.DeletedProduct", b =>
@@ -94,7 +94,7 @@ namespace InventoryApi.Migrations
 
                     b.HasKey("DeletedProductId");
 
-                    b.ToTable("DeletedProducts");
+                    b.ToTable("DeletedProducts", (string)null);
                 });
 
             modelBuilder.Entity("InventoryApi.Models.Product", b =>
@@ -139,7 +139,7 @@ namespace InventoryApi.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Product", (string)null);
                 });
 
             modelBuilder.Entity("InventoryApi.Models.ProductFavorite", b =>
@@ -161,7 +161,7 @@ namespace InventoryApi.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductFavorites");
+                    b.ToTable("ProductFavorites", (string)null);
                 });
 
             modelBuilder.Entity("InventoryApi.Models.StockMovement", b =>
@@ -189,7 +189,7 @@ namespace InventoryApi.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("StockMovements");
+                    b.ToTable("StockMovements", (string)null);
                 });
 
             modelBuilder.Entity("InventoryApi.Models.Product", b =>

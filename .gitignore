@@ -40,3 +40,8 @@ desktop.ini
 *.zip
 *.rar
 *.7z
+
+# Root'taki npm dosyalarını ignore et
+/package.json
+/package-lock.json
+

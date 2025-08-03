@@ -15,6 +15,8 @@ import StockMovements from "./pages/StockMovements";
 import DeletedProductsTable from "./pages/DeletedProductsTable";
 import LoginForm from "./pages/LoginForm";
 import RegisterForm from "./pages/RegisterForm";
+import ChangePassword from "./pages/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword"; // ✅ Şifremi Unuttum eklendi
 
 import { ThemeContextProvider, useThemeContext } from "./components/ThemeContext";
 
@@ -64,14 +66,14 @@ function AppContent() {
   return (
     <Router>
       {/* Sağ üstte Dark/Light butonu */}
-        <Box position="fixed" top={10} right={10} zIndex={1500}>
-          <IconButton onClick={toggleTheme} color="inherit">
-            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
-        </Box>
+      <Box position="fixed" top={10} right={10} zIndex={1500}>
+        <IconButton onClick={toggleTheme} color="inherit">
+          {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
+      </Box>
 
       <Routes>
-        {/* Login & Register */}
+        {/* Login */}
         <Route
           path="/login"
           element={
@@ -85,10 +87,14 @@ function AppContent() {
                   setLoggedIn(true);
                 }}
                 onSwitchToRegister={() => (window.location.href = "/register")}
+                onSwitchToChangePassword={() => (window.location.href = "/change-password")}
+                onSwitchToForgotPassword={() => (window.location.href = "/forgot-password")} // ✅ Eklendi
               />
             )
           }
         />
+
+        {/* Register */}
         <Route
           path="/register"
           element={
@@ -103,6 +109,21 @@ function AppContent() {
                 }}
                 onSwitchToLogin={() => (window.location.href = "/login")}
               />
+            )
+          }
+        />
+
+        {/* Change Password */}
+        <Route path="/change-password" element={<ChangePassword />} />
+
+        {/* Forgot Password */}
+        <Route
+          path="/forgot-password"
+          element={
+            loggedIn ? (
+              <Navigate to="/" />
+            ) : (
+              <ForgotPassword /> // ✅ Yeni eklenen sayfa
             )
           }
         />
