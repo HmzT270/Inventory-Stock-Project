@@ -11,11 +11,9 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,20}$/;
-
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const users = JSON.parse(localStorage.getItem("users") || "[]");
     const user = users.find(
       (u) => u.username === username && u.password === password
@@ -23,14 +21,6 @@ export default function LoginForm({
 
     if (!user) {
       setError("❌ Kullanıcı adı veya parola yanlış!");
-      return;
-    }
-
-    // ✅ Şifre karmaşıklık kontrolü
-    if (!passwordRegex.test(password)) {
-      setError(
-        "❌ Parola 6-20 karakter olmalı, en az 1 büyük, 1 küçük, 1 rakam ve 1 özel karakter içermeli!"
-      );
       return;
     }
 

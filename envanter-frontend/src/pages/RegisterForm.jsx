@@ -23,16 +23,9 @@ const labelSx = {
   "&.MuiInputLabel-shrink": { color: "text.primary" },
 };
 
-// ✅ Şifre gücü hesaplama
-const calculatePasswordStrength = (password) => {
-  let score = 0;
-  if (password.length >= 6) score++;
-  if (/[A-Z]/.test(password)) score++;
-  if (/[a-z]/.test(password)) score++;
-  if (/\d/.test(password)) score++;
-  if (/[^A-Za-z0-9]/.test(password)) score++;
-  return Math.min(score, 4);
-};
+// ✅ LoginForm ile aynı şifre regex'i
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,20}$/;
 
 export default function RegisterForm({ onRegister, onSwitchToLogin }) {
   const [username, setUsername] = useState("");
@@ -44,11 +37,6 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
 
   const [status, setStatus] = useState({ success: null, message: "" });
   const [showStatus, setShowStatus] = useState(false);
-
-  // ✅ Şifre gücü
-  const strength = calculatePasswordStrength(password);
-  const strengthColors = ["#d32f2f", "#f57c00", "#fbc02d", "#388e3c"];
-  const strengthTexts = ["Çok Zayıf", "Zayıf", "Orta", "Güçlü"];
 
   const showTemporaryMessage = (isSuccess, msg) => {
     setStatus({ success: isSuccess, message: msg });
@@ -63,17 +51,21 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
       showTemporaryMessage(false, "Lütfen kullanıcı adı ve parola girin.");
       return;
     }
-    if (strength < 3) {
+
+    // ✅ Şifre kurallarını LoginForm ile aynı şekilde kontrol et
+    if (!passwordRegex.test(password)) {
       showTemporaryMessage(
         false,
-        "Parola çok zayıf. En az 6 karakter, büyük/küçük harf, sayı ve özel karakter içermeli."
+        "Parola 6-20 karakter olmalı, en az 1 büyük, 1 küçük, 1 rakam ve 1 özel karakter içermeli."
       );
       return;
     }
+
     if (password !== passwordConfirm) {
       showTemporaryMessage(false, "Parolalar eşleşmiyor.");
       return;
     }
+
     if (!securityQuestion || !securityAnswer) {
       showTemporaryMessage(false, "Lütfen güvenlik sorusunu ve cevabını girin.");
       return;
@@ -98,7 +90,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
     // ✅ Kullanıcı adını LocalStorage'a kaydet
     localStorage.setItem("username", newUser.username);
 
-    // SESSION KEY işlemi
+    // ✅ SESSION KEY işlemi
     const sessionKey = Math.random().toString(36).substring(2);
     localStorage.setItem("currentUser", JSON.stringify(newUser));
     localStorage.setItem("sessionKey", sessionKey);
@@ -159,48 +151,13 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
             autoComplete="new-password"
           />
 
-          {/* ✅ Şifre Kuralı Yazısı */}
           {password && (
             <Typography
               variant="caption"
-              sx={{ display: "block", color: "text.secondary", mb: 0.5 }}
+              sx={{ display: "block", color: "text.secondary", mb: 2 }}
             >
               Parola 6-20 karakter olmalı, en az 1 büyük, 1 küçük, 1 sayı ve 1 özel karakter içermeli.
             </Typography>
-          )}
-
-          {/* ✅ Animasyonlu Şifre Güç Çubuğu */}
-          {password && (
-            <Box sx={{ mb: 2 }}>
-              <Box
-                sx={{
-                  height: 8,
-                  width: "100%",
-                  backgroundColor: "#e0e0e0",
-                  borderRadius: 3,
-                  overflow: "hidden",
-                  mb: 0.5,
-                }}
-              >
-                <Box
-                  sx={{
-                    height: "100%",
-                    width: `${(strength / 4) * 100}%`,
-                    backgroundColor: strengthColors[strength - 1] || "#d32f2f",
-                    transition: "width 0.4s ease, background-color 0.4s ease",
-                  }}
-                />
-              </Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: strengthColors[strength - 1] || "#d32f2f",
-                  transition: "color 0.4s ease",
-                }}
-              >
-                {strengthTexts[strength - 1] || "Çok Zayıf"}
-              </Typography>
-            </Box>
           )}
 
           <TextField
@@ -214,7 +171,6 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
             autoComplete="new-password"
           />
 
-          {/* ✅ Güvenlik Sorusu */}
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel>Güvenlik Sorusu</InputLabel>
             <Select

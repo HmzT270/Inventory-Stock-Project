@@ -322,7 +322,7 @@ to { background-color: rgba(255,59,59,0.96); }
       field: "serialNumber",
       headerName: "Sıra No",
       flex: 1,
-      minWidth: 70,
+      Width: 70,
       renderCell: (params) => (
         <Box sx={{ color: "text.primary", fontWeight: "bold" }}>
           {params.value}
