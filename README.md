@@ -42,8 +42,6 @@ npm install  # Gerekli paketleri yükler
 npm run dev  # Uygulamayı http://localhost:5173 adresinde başlatır
 ```
 
----
-
 ## 🛠️ Veritabanı Kurulumu
 
 Bu projede fiziksel bir SQL dosyası (`.sql`, `.bak`, `.mdf`) paylaşılmamaktadır.  
@@ -79,7 +77,16 @@ dotnet ef database update # Veri tabanını güncelle
 ```
 
 > Bu işlem, veritabanını `Migrations/` klasöründeki tanımlara göre sıfırdan oluşturur.
-> Migrationları veri tabanınıza ekledikten sonra vs code üzerinden connect diyerek bağlanın.
+
+4. **Connect database diyerek profil oluşturun:**
+```bash
+profil name kısmına istediğiniz ismi verin
+server name kısmına 'localhost\SQLEXPRESS' yazın
+Authentication type için Windows Authentication seçin
+database name kısmına appsettings.json dosyasındaki database adı ile aynı yapın (eğer değiştirmediyseniz adı 'Deneme')
+Connect (Bağlan) butonuna basın.
+```
+
 > Örnek veriler için örnek olarak verilen InventoryDb_FullScricpt.sql dosyasındaki insert komutlarını veri tabanınızda çalıştırın
 
 ---
