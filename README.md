@@ -78,7 +78,9 @@ dotnet ef database update # Veri tabanını güncelle
 
 > Bu işlem, veritabanını `Migrations/` klasöründeki tanımlara göre sıfırdan oluşturur.
 
-4. **Connect database diyerek profil oluşturun:**
+4. **Vs code üzerinde veri tabanını kullanabilmek için Microsoft SQL Server (mssql) eklentisini kurun:**
+
+5. **Connect database diyerek profil oluşturun:**
 ```bash
 profil name kısmına istediğiniz ismi verin
 server name kısmına 'localhost\SQLEXPRESS' yazın
