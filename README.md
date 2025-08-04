@@ -63,14 +63,7 @@ Başka bir kullanıcı bu projeyi kendi bilgisayarına indirip aşağıdaki adı
 cd inventory-stock-system/InventoryApi
 ```
 
-2. **appsettings.json içindeki database adını istediğiniz şekilde düzenleyin veya 'Deneme' olarak bırakın**
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=localhost\SQLEXPRESS;Database=Deneme;Trusted_Connection=True;"
-}
-```
-
-3. **Aşağıdaki komutla veritabanını oluşturun:**
+2. **Aşağıdaki komutla veritabanını oluşturun:**
 ```bash
 dotnet tool install --global dotnet-ef # Dotnet EF araçlarını global olarak yükle
 dotnet ef database update # Veri tabanını güncelle
@@ -78,14 +71,14 @@ dotnet ef database update # Veri tabanını güncelle
 
 > Bu işlem, veritabanını `Migrations/` klasöründeki tanımlara göre sıfırdan oluşturur.
 
-4. **Vs code üzerinde veri tabanını kullanabilmek için Microsoft SQL Server (mssql) eklentisini kurun:**
+3. **Vs code üzerinde veri tabanını kullanabilmek için Microsoft SQL Server (mssql) eklentisini kurun:**
 
-5. **Connect database diyerek profil oluşturun:**
+4. **Connect database diyerek profil oluşturun:**
 ```bash
 profil name kısmına istediğiniz ismi verin
 server name kısmına 'localhost\SQLEXPRESS' yazın
 Authentication type için Windows Authentication seçin
-database name kısmına appsettings.json dosyasındaki database adı ile aynı yapın (eğer değiştirmediyseniz adı 'Deneme')
+database name kısmına 'Deneme' yazın
 Encrypt optional seçebilirsiniz
 Connect (Bağlan) butonuna basın.
 ```
