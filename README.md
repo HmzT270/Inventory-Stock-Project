@@ -86,6 +86,7 @@ profil name kısmına istediğiniz ismi verin
 server name kısmına 'localhost\SQLEXPRESS' yazın
 Authentication type için Windows Authentication seçin
 database name kısmına appsettings.json dosyasındaki database adı ile aynı yapın (eğer değiştirmediyseniz adı 'Deneme')
+Encrypt optional seçebilirsiniz
 Connect (Bağlan) butonuna basın.
 ```
 
