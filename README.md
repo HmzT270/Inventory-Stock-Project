@@ -73,10 +73,11 @@ dotnet ef database update # Veri tabanını güncelle
 
 3. **Vs code üzerinde veri tabanını kullanabilmek için Microsoft SQL Server (mssql) eklentisini kurun:**
 
-4. **Connect database diyerek profil oluşturun:**
+4. **"Connect database" diyerek profil oluşturun:**
 ```bash
 profil name kısmına istediğiniz ismi verin
 server name kısmına 'localhost\SQLEXPRESS' yazın
+Trust server certificate kutusunu tikleyin
 Authentication type için Windows Authentication seçin
 database name kısmına 'Deneme' yazın
 Encrypt optional seçebilirsiniz
@@ -86,6 +87,35 @@ Connect (Bağlan) butonuna basın.
 > Örnek veriler için örnek olarak verilen InventoryDb_FullScricpt.sql dosyasındaki insert komutlarını veri tabanınızda çalıştırın
 
 ---
+
+5. **Eğer veritabanının adını değiştirmek isterseniz ssms uygulamasına girin, hiçbir veri tabanına bağlı değilken 'Yeni Sorgu' diyin aşağıdaki komutları sırayla çalıştırın:**
+```bash
+USE master;
+ALTER DATABASE Deneme SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+ALTER DATABASE Deneme MODIFY NAME = yeni_ad;
+ALTER DATABASE yeni_ad SET MULTI_USER;
+
+```
+
+6. **appsettings.json dosyasındaki Database=Deneme adını, yeni_ad olarak güncelleyin:**
+```bash
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=Deneme;Trusted_Connection=True;TrustServerCertificate=True;"
+  },
+```
+
+6. **vs code üzerinden "connect database" seçeneği seçin ve "Create Connection Profile" seçeneğini seçin:**
+
+7. **Gelen ekrenda eski profil bilgilerini aynen doldurun, "Database name" kısmını ise yeni oluşturduğunuz isim yapın**
+```bash
+profil name kısmı aynen kalacak
+server name kısmına 'localhost\SQLEXPRESS' yazın
+Trust server certificate kutusunu tikleyin
+Authentication type için Windows Authentication seçin
+database name kısmına koyduğunuz yeni ismi yazın
+Encrypt optional seçebilirsiniz
+Connect (Bağlan) butonuna basın.
+```
 
 ## 📝 Temel Özellikler
 
