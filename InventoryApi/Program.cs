@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<InventoryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// CORS ayarı — 🔽 burayı EKLEDİK
+// CORS ayarı
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
@@ -19,30 +19,28 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Servisleri ekle
+// JSON döngü hatasını engelle
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
 
+// Servisler
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Uygulama pipeline'ı
+// Uygulama pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// CORS middleware — 🔽 burayı EKLEDİK
+// CORS middleware
 app.UseCors("AllowReactApp");
-
-// 🔽 HTTPS yönlendirme kaldırıldı
-// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

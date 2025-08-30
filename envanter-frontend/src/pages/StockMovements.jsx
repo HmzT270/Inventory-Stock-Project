@@ -123,6 +123,7 @@ export default function StockMovements() {
       >
         <Grid container spacing={2} justifyContent="center">
           <Grid sx={{ width: "100%" }}>
+            
             {/* Ana Kutu */}
             <Box
               sx={{

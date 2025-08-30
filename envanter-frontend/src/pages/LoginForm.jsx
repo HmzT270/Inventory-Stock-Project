@@ -20,11 +20,11 @@ export default function LoginForm({
     );
 
     if (!user) {
-      setError("❌ Kullanıcı adı veya parola yanlış!");
+      setError("Kullanıcı adı veya parola yanlış!");
       return;
     }
 
-    // ✅ Kullanıcıyı LocalStorage'a kaydet
+    // Kullanıcıyı LocalStorage'a kaydet
     localStorage.setItem("username", user.username);
 
     // SESSION KEY işlemi
@@ -33,7 +33,7 @@ export default function LoginForm({
     localStorage.setItem("sessionKey", sessionKey);
     window.sessionStorage.setItem("activeSessionKey", sessionKey);
 
-    // ✅ Login callback
+    // Login callback
     onLogin(user.role, user.username);
   };
 

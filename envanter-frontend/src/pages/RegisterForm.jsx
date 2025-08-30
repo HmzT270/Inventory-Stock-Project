@@ -23,7 +23,7 @@ const labelSx = {
   "&.MuiInputLabel-shrink": { color: "text.primary" },
 };
 
-// ✅ LoginForm ile aynı şifre regex'i
+// LoginForm ile aynı şifre regex'i
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,20}$/;
 
@@ -52,7 +52,7 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
       return;
     }
 
-    // ✅ Şifre kurallarını LoginForm ile aynı şekilde kontrol et
+    // Şifre kurallarını LoginForm ile aynı şekilde kontrol et
     if (!passwordRegex.test(password)) {
       showTemporaryMessage(
         false,
@@ -87,10 +87,10 @@ export default function RegisterForm({ onRegister, onSwitchToLogin }) {
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
 
-    // ✅ Kullanıcı adını LocalStorage'a kaydet
+    // Kullanıcı adını LocalStorage'a kaydet
     localStorage.setItem("username", newUser.username);
 
-    // ✅ SESSION KEY işlemi
+    // SESSION KEY işlemi
     const sessionKey = Math.random().toString(36).substring(2);
     localStorage.setItem("currentUser", JSON.stringify(newUser));
     localStorage.setItem("sessionKey", sessionKey);

@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5184/api/Product';
 
+// Tüm ürünleri getir
 export const getAllProducts = async () => {
   try {
     const response = await axios.get(API_URL);
@@ -12,6 +13,7 @@ export const getAllProducts = async () => {
   }
 };
 
+// Ürün sil
 export const deleteProduct = async (id) => {
   try {
     await axios.delete(`${API_URL}/${id}`);
@@ -38,24 +40,13 @@ export const updateProductDescription = async (productId, newDescription) => {
       NewDescription: newDescription
     });
   } catch (error) {
-    console.error('Açıklama güncellenemedi:', error);
+    console.error('Açiklama güncellenemedi:', error);
     throw error;
   }
 };
 
-// Son 10 silinen ürünü getir
-export const getLast10Deleted = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/Last10Deleted`);
-    return response.data;
-  } catch (error) {
-    console.error('Son silinen ürünler alınamadı:', error);
-    return [];
-  }
-};
-
 // Ürün kategorisini değiştir
-export const updateProductCategory = async (productId, newCategoryId) => {
+export const changeProductCategory = async (productId, newCategoryId) => {
   try {
     await axios.put(`${API_URL}/${productId}/ChangeCategory`, {
       categoryId: newCategoryId

@@ -133,7 +133,7 @@ to { background-color: rgba(255,59,59,0.96); }
     }
   }, [location.pathname]);
 
-  // ⭐ products state güncellenince yeniden renderı zorla
+  // products state güncellenince yeniden renderı zorla
   useEffect(() => {
     if (showFavoritesIcon && products.length > 0 && !hasRefreshedFavorites) {
       // Mevcut state ile yeni state birebir aynıysa tekrar set etme
@@ -141,18 +141,17 @@ to { background-color: rgba(255,59,59,0.96); }
         const prevStr = JSON.stringify(prev.map((p) => p.isFavorite));
         const newStr = JSON.stringify(products.map((p) => p.isFavorite));
 
-        if (prevStr === newStr) return prev; // ✅ Değişiklik yoksa set etme
-        return [...prev]; // ✅ Re-render tetikle
+        if (prevStr === newStr) return prev; // Değişiklik yoksa set etme
+        return [...prev]; // Re-render tetikle
       });
 
-      setHasRefreshedFavorites(true); // ✅ Sadece 1 kere çalışır
+      setHasRefreshedFavorites(true); // Sadece 1 kere çalışır
     }
   }, [showFavoritesIcon, products]);
 
-  // 🔹 Giriş yapan kullanıcının ID'si, gerçekte token veya contextten gelecek
-
+  // Giriş yapan kullanıcının ID'si, gerçekte token veya contextten gelecek
   const toggleFavorite = async (id) => {
-    // 🔹 Kullanıcı adı boş veya "null" ise uyarı ver, backend'e gitme
+    // Kullanıcı adı boş veya "null" ise uyarı ver, backend'e gitme
     if (!currentUsername || currentUsername.trim().toLowerCase() === "null") {
       setFavoriteStatus({
         success: false,
@@ -183,8 +182,8 @@ to { background-color: rgba(255,59,59,0.96); }
       setFavoriteStatus({
         success: true,
         message: isFav
-          ? "Ürün favorilere eklendi ⭐"
-          : "Ürün favorilerden çıkarıldı ❌",
+          ? "Ürün favorilere eklendi"
+          : "Ürün favorilerden çıkarıldı",
         type: isFav ? "success" : "warning",
       });
       setShowFavoriteStatus(true);
@@ -216,7 +215,7 @@ to { background-color: rgba(255,59,59,0.96); }
   };
 
   const clearAllFavorites = async () => {
-    // 🔹 Kullanıcı adı boş veya "null" ise işlem yapılmaz
+    // Kullanıcı adı boş veya "null" ise işlem yapılmaz
     if (!currentUsername || currentUsername.trim().toLowerCase() === "null") {
       setFavoriteStatus({
         success: false,
@@ -245,7 +244,7 @@ to { background-color: rgba(255,59,59,0.96); }
       setTimeout(() => setShowFavoriteStatus(false), 1500);
       setTimeout(() => setFavoriteStatus({ success: null, message: "" }), 3000);
 
-      // ✅ Listeyi güncelle
+      // Listeyi güncelle
       loadSortedProducts(currentUsername);
     } catch (error) {
       console.error("Favoriler silinemedi", error);
@@ -286,7 +285,7 @@ to { background-color: rgba(255,59,59,0.96); }
           : filterType === "outofstock"
           ? row.quantity === 0
           : filterType === "favorites"
-          ? row.isFavorite // ⭐ Favori ürünler
+          ? row.isFavorite // Favori ürünler
           : true;
 
       const matchesSearch = row.name
@@ -350,8 +349,8 @@ to { background-color: rgba(255,59,59,0.96); }
           sx={{
             display: "flex",
             alignItems: "center",
-            position: "relative", // ⭐ Absolute positioning için gerekli
-            pl: showFavoritesIcon ? 3 : 0, // ⭐ Yıldız için solda boşluk
+            position: "relative",
+            pl: showFavoritesIcon ? 3 : 0,
             color: "text.primary",
             fontWeight: "bold",
             gap: 1,
@@ -366,7 +365,7 @@ to { background-color: rgba(255,59,59,0.96); }
               size="small"
               onClick={() => toggleFavorite(params.row.productId)}
               sx={{
-                position: "absolute", // ✅ Kolon genişliğini etkilemez
+                position: "absolute",
                 left: 0,
                 top: "50%",
                 transform: "translateY(-50%)",
@@ -463,7 +462,7 @@ to { background-color: rgba(255,59,59,0.96); }
         Marka: p.brand || "Yok",
         Kategori: p.category || "Yok",
         Stok: p.quantity,
-        Açıklama: p.description || "", // ✅ Açıklama sütunu eklendi
+        Açıklama: p.description || "",
         "Eklenme Tarihi": new Date(p.createdAt).toLocaleDateString(),
       }))
     );
@@ -480,18 +479,17 @@ to { background-color: rgba(255,59,59,0.96); }
     saveAs(blob, `urunler_${Date.now()}.xlsx`);
   };
 
-  // PDF Export (Türkçe karakter destekli)
+  // PDF Export
   const exportToPDF = (data) => {
     const doc = new jsPDF();
 
-    // Özel fontu ekle ve kullan
     doc.addFileToVFS("OpenSans-Light.ttf", myFont);
     doc.addFont("OpenSans-Light.ttf", "OpenSans", "normal");
     doc.setFont("OpenSans");
 
     doc.text("Ürün Dökümü", 14, 10);
 
-    // ✅ Açıklama sütunu eklendi
+    // PDF Sütunları
     const tableColumn = [
       "ID",
       "Ürün Adı",
@@ -507,7 +505,7 @@ to { background-color: rgba(255,59,59,0.96); }
       p.brand || "Yok",
       p.category || "Yok",
       p.quantity,
-      p.description || "", // ✅ Açıklama ekleniyor
+      p.description || "",
       new Date(p.createdAt).toLocaleDateString("tr-TR"), // Türkçe tarih formatı
     ]);
 
@@ -515,9 +513,9 @@ to { background-color: rgba(255,59,59,0.96); }
       head: [tableColumn],
       body: tableRows,
       startY: 20,
-      styles: { font: "OpenSans", fontStyle: "normal" }, // Tablo için font
-      headStyles: { font: "OpenSans", fontStyle: "normal" }, // Başlıklar için font
-      bodyStyles: { font: "OpenSans", fontStyle: "normal" }, // Hücreler için font
+      styles: { font: "OpenSans", fontStyle: "normal" },
+      headStyles: { font: "OpenSans", fontStyle: "normal" },
+      bodyStyles: { font: "OpenSans", fontStyle: "normal" },
       columnStyles: {
         0: { cellWidth: 15, overflow: "linebreak" }, // ID
         1: { cellWidth: 35, overflow: "linebreak" }, // Ad
@@ -527,7 +525,7 @@ to { background-color: rgba(255,59,59,0.96); }
         5: { cellWidth: 45, overflow: "linebreak" }, // Açıklama
         6: { cellWidth: 30, overflow: "linebreak" }, // Eklenme Tarihi
       },
-      margin: { top: 20, left: 10, right: 10 }, // ✅ Sağ/sol eşit
+      margin: { top: 20, left: 10, right: 10 },
     });
 
     doc.save(`urunler_${Date.now()}.pdf`);
@@ -559,8 +557,8 @@ to { background-color: rgba(255,59,59,0.96); }
               alignItems: "center",
             }}
           >
-            {/* Kategori */}
-            <div style={{ minWidth: 170, maxWidth: 210 }}>
+            {/* Kategori Filtrele */}
+            <div style={{ minWidth: 170, maxWidth: 210 }}> 
               <Autocomplete
                 multiple
                 size="small"
@@ -595,7 +593,7 @@ to { background-color: rgba(255,59,59,0.96); }
                   },
                 }}
                 renderOption={(props, option, { selected }) => {
-                  const { key, ...otherProps } = props; // key'i ayrı al, diğerlerini spread et
+                  const { key, ...otherProps } = props;
                   return (
                     <li
                       key={key}
@@ -627,7 +625,7 @@ to { background-color: rgba(255,59,59,0.96); }
               />
             </div>
 
-            {/* Marka */}
+            {/* Marka Filtrele */}
             <div style={{ minWidth: 170, maxWidth: 210 }}>
               <Autocomplete
                 multiple
@@ -661,11 +659,11 @@ to { background-color: rgba(255,59,59,0.96); }
                   },
                 }}
                 renderOption={(props, option, { selected }) => {
-                  const { key, ...otherProps } = props; // key'i ayır
+                  const { key, ...otherProps } = props;
                   return (
                     <li
-                      key={key} // key'i ayrı ver
-                      {...otherProps} // diğer props'ları yay
+                      key={key}
+                      {...otherProps}
                       style={{
                         fontSize: 15,
                       }}
@@ -692,10 +690,10 @@ to { background-color: rgba(255,59,59,0.96); }
               />
             </div>
 
-            {/* Filtre */}
+            {/* Ürün Filtrele */}
             <div style={{ minWidth: 170, maxWidth: 210 }}>
               <Autocomplete
-                options={productFilters} // ⭐ Sabit diziyi kaldırdık
+                options={productFilters}
                 getOptionLabel={(option) => option.name}
                 value={
                   productFilters.find((opt) => opt.value === filterType) || null
@@ -758,7 +756,7 @@ to { background-color: rgba(255,59,59,0.96); }
               />
             </div>
 
-            {/* Sıralama */}
+            {/* Ürünleri Sırala */}
             <div style={{ minWidth: 170, maxWidth: 210 }}>
               <Autocomplete
                 options={[
@@ -810,7 +808,7 @@ to { background-color: rgba(255,59,59,0.96); }
                   const { key, ...otherProps } = props;
                   return (
                     <li
-                      key={key ?? option.value} // key ekledik, yoksa option.value kullanılır
+                      key={key ?? option.value}
                       {...otherProps}
                       style={{
                         color: "text.primary",
@@ -839,7 +837,7 @@ to { background-color: rgba(255,59,59,0.96); }
               />
             </div>
 
-            {/* Arama */}
+            {/* Ürün Ara */}
             <TextField
               label="Ürün Ara"
               variant="outlined"
@@ -973,7 +971,7 @@ to { background-color: rgba(255,59,59,0.96); }
                 PDF İndir
               </Button>
 
-              {/* ✅ Butonlara yakın Yıldızları Göster */}
+              {/* Yıldızları Göster */}
               <FormControlLabel
                 control={
                   <Checkbox
@@ -982,11 +980,11 @@ to { background-color: rgba(255,59,59,0.96); }
                   />
                 }
                 label="Favoriler"
-                sx={{ ml: 1 }} // Butonlara yakınlaştır
+                sx={{ ml: 1 }}
               />
             </Box>
 
-            {/* Sağ: Favori Uyarı Mesajı */}
+            {/* Favori Uyarı Mesajı */}
             <Fade in={showFavoriteStatus} timeout={1500}>
               <Alert
                 severity={favoriteStatus.type || "info"}

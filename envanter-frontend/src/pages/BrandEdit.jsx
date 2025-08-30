@@ -101,7 +101,7 @@ export default function BrandEdit() {
       if (res.data && res.data.length > 0) {
         setPendingDelete(deleteBrandValue);
         setRelatedCount(res.data.length);
-        setConfirmDeleteVisible(true); // ✅ Onay kutusunu aç
+        setConfirmDeleteVisible(true); // Onay kutusunu aç
         return;
       }
 
@@ -125,7 +125,7 @@ export default function BrandEdit() {
     setConfirmDeleteVisible(false);
 
     if (!confirm || !pendingDelete) {
-      // ❌ Kullanıcı "Hayır" dedi
+      // Kullanıcı "Hayır" derse
       showTemporaryMessage(setDeleteStatus, setShowDeleteStatus, {
         success: false,
         message: "Silme işlemi iptal edildi.",
@@ -189,6 +189,7 @@ export default function BrandEdit() {
       }}
     >
       <Grid rowSpacing={3} container spacing={6} justifyContent="center">
+        
         {/* Marka Ekle */}
         <Grid>
           <Paper
@@ -227,6 +228,8 @@ export default function BrandEdit() {
               Ekle
             </Button>
           </Paper>
+
+          {/* Marka Ekle Uyarı Mesajı */}
           <Grid sx={{ mt: 2, height: 40 }}>
             <Fade in={showAddStatus} timeout={1500}>
               <Box sx={{ width: "100%" }}>
@@ -297,7 +300,7 @@ export default function BrandEdit() {
               Sil
             </Button>
 
-            {/* ✅ Onay Kutusu */}
+            {/* Marka Sil Uyarı Mesajı */} 
             {confirmDeleteVisible && (
               <Box
                 sx={{
@@ -333,7 +336,6 @@ export default function BrandEdit() {
               </Box>
             )}
           </Paper>
-
           <Grid sx={{ mt: 2, height: 40 }}>
             <Fade in={showDeleteStatus} timeout={1500}>
               <Box sx={{ width: "100%" }}>

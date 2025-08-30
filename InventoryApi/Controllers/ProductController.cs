@@ -16,37 +16,22 @@ namespace InventoryApi.Controllers
             _context = context;
         }
 
+        // DTO
         public class ProductCreateDto
         {
             public string Name { get; set; } = string.Empty;
             public int Quantity { get; set; }
             public int CategoryId { get; set; }
-            public int? BrandId { get; set; }
             public string? Description { get; set; }
             public int CriticalStockLevel { get; set; }
-            public string? CreatedBy { get; set; }
-        }
-
-        public class UpdateDescriptionDto
-        {
             public string NewDescription { get; set; } = string.Empty;
-        }
-
-        public class RenameProductDto
-        {
             public string NewName { get; set; } = string.Empty;
-        }
-
-        public class ChangeCategoryDto
-        {
-            public int CategoryId { get; set; }
-        }
-
-        public class DeleteProductDto
-        {
+            public int? BrandId { get; set; }
+            public string? CreatedBy { get; set; }
             public string? DeletedBy { get; set; }
         }
 
+        // Tüm ürünleri sıra numarası ile getir
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetProducts()
         {
@@ -57,6 +42,7 @@ namespace InventoryApi.Controllers
                 .OrderBy(p => p.ProductId)
                 .ToListAsync();
 
+            // SerialNumber ekle
             return Ok(products.Select((p, i) => new
             {
                 SerialNumber = i + 1,
@@ -67,14 +53,15 @@ namespace InventoryApi.Controllers
                 p.Description,
                 p.CreatedAt,
                 p.CriticalStockLevel,
+                p.BrandId,
                 p.CreatedBy,
                 Category = p.Category?.Name,
-                Brand = p.Brand?.Name,
-                BrandId = p.BrandId,
-                StockMovementCount = p.StockMovements?.Count ?? 0
+                StockMovementCount = p.StockMovements?.Count ?? 0,
+                Brand = p.Brand?.Name
             }));
         }
 
+        // Ürünleri sırala
         [HttpGet("Sorted")]
         public async Task<ActionResult<IEnumerable<object>>> GetSortedProducts(
             [FromQuery] string orderBy = "serialnumber",
@@ -82,20 +69,20 @@ namespace InventoryApi.Controllers
             [FromQuery] string userId = ""
         )
         {
-            // 1️⃣ Tüm ürünleri ilişkileriyle birlikte çek
+            // Tüm ürünleri ilişkileriyle birlikte çek
             var products = await _context.Product
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
                 .Include(p => p.StockMovements)
                 .ToListAsync();
 
-            // 2️⃣ Kullanıcıya ait favori ürünleri tek seferde al (performanslı)
+            // Kullanıcıya ait favori ürünleri tek seferde al
             var userFavorites = _context.ProductFavorites
                 .Where(f => f.UserId == userId)
                 .Select(f => f.ProductId)
                 .ToHashSet();
 
-            // 3️⃣ Ürünleri map'le ve kullanıcıya özel IsFavorite ekle
+            // Ürünleri map'le ve kullanıcıya özel IsFavorite ekle
             var sorted = products.Select((p, i) => new
             {
                 SerialNumber = i + 1,
@@ -108,16 +95,16 @@ namespace InventoryApi.Controllers
                 p.CriticalStockLevel,
                 p.CreatedBy,
 
-                // ⭐ Kullanıcıya özel favori bilgisi
+                // Kullanıcıya özel favori bilgisi
                 IsFavorite = userFavorites.Contains(p.ProductId),
 
                 Category = p.Category?.Name ?? "",
+                StockMovementCount = p.StockMovements?.Count ?? 0,
                 Brand = p.Brand?.Name ?? "",
-                BrandId = p.BrandId,
-                StockMovementCount = p.StockMovements?.Count ?? 0
+                p.BrandId
             });
 
-            // 4️⃣ Sıralama
+            // Sıralama
             sorted = (orderBy.ToLower(), direction.ToLower()) switch
             {
                 ("name", "asc") => sorted.OrderBy(p => p.Name),
@@ -138,8 +125,7 @@ namespace InventoryApi.Controllers
             return Ok(sorted.ToList());
         }
 
-
-
+        // Ürün ekle
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(ProductCreateDto dto)
         {
@@ -160,9 +146,9 @@ namespace InventoryApi.Controllers
             return CreatedAtAction(nameof(GetProducts), new { id = product.ProductId }, product);
         }
 
+        // Ürün adını değiştir
         [HttpPut("Rename/{id}")]
-        public async Task<IActionResult> RenameProduct(int id, [FromBody] RenameProductDto dto)
-        {
+        public async Task<IActionResult> RenameProduct(int id, [FromBody] ProductCreateDto dto) {
             if (string.IsNullOrWhiteSpace(dto.NewName)) return BadRequest("Yeni ürün adı boş olamaz.");
 
             var product = await _context.Product.FindAsync(id);
@@ -174,8 +160,24 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
+        // Ürün açıklamasını değiştir
+        [HttpPut("{id}/UpdateDescription")] public async Task<IActionResult>
+        UpdateDescription(int id, [FromBody] ProductCreateDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.NewDescription)) return BadRequest("Açıklama boş olamaz.");
+
+            var product = await _context.Product.FindAsync(id);
+            if (product == null) return NotFound();
+
+            product.Description = dto.NewDescription;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // Ürün kategorisini değiştir
         [HttpPut("{id}/ChangeCategory")]
-        public async Task<IActionResult> ChangeCategory(int id, [FromBody] ChangeCategoryDto dto)
+        public async Task<IActionResult> ChangeCategory(int id, [FromBody] ProductCreateDto dto)
         {
             var product = await _context.Product.FindAsync(id);
             if (product == null) return NotFound();
@@ -189,20 +191,8 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}/UpdateDescription")]
-        public async Task<IActionResult> UpdateDescription(int id, [FromBody] UpdateDescriptionDto dto)
-        {
-            if (string.IsNullOrWhiteSpace(dto.NewDescription)) return BadRequest("Açıklama boş olamaz.");
 
-            var product = await _context.Product.FindAsync(id);
-            if (product == null) return NotFound();
-
-            product.Description = dto.NewDescription;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
+        // Stok miktarını güncelle
         [HttpPut("UpdateStock/{id}")]
         public async Task<IActionResult> UpdateStock(int id, [FromBody] int newStock)
         {
@@ -215,8 +205,9 @@ namespace InventoryApi.Controllers
             return Ok(product);
         }
 
+        // Silinen ürünü kaydet
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id, [FromBody] DeleteProductDto dto)
+        public async Task<IActionResult> DeleteProduct(int id, [FromBody] ProductCreateDto dto)
         {
             var product = await _context.Product
                 .Include(p => p.Category)
@@ -235,7 +226,7 @@ namespace InventoryApi.Controllers
                 Brand = product.Brand?.Name,
                 OriginalProductId = product.ProductId,
                 DeletedBy = dto.DeletedBy,
-                CreatedBy = product.CreatedBy // ✅ Ekleyen kişi bilgisi kaydedildi
+                CreatedBy = product.CreatedBy
             });
 
             _context.Product.Remove(product);
@@ -244,6 +235,7 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
+        // Kategoriye göre ürünleri getir
         [HttpGet("ByCategory/{categoryId}")]
         public async Task<ActionResult<IEnumerable<object>>> GetProductsByCategory(int categoryId)
         {
@@ -269,7 +261,7 @@ namespace InventoryApi.Controllers
             }));
         }
 
-        // ✅ Belirli bir markaya ait tüm ürünleri getir
+        // Belirli bir markaya ait tüm ürünleri getir
         [HttpGet("ByBrand/{brandId}")]
         public async Task<ActionResult<IEnumerable<object>>> GetProductsByBrand(int brandId)
         {
@@ -295,7 +287,7 @@ namespace InventoryApi.Controllers
             }));
         }
 
-
+        // Ada göre arama yap
         [HttpGet("SearchByName/{query}")]
         public async Task<ActionResult<IEnumerable<object>>> SearchByName(string query)
         {
@@ -324,11 +316,12 @@ namespace InventoryApi.Controllers
                 p.CreatedBy,
                 Category = p.Category?.Name,
                 Brand = p.Brand?.Name,
-                BrandId = p.BrandId,
+                p.BrandId,
                 StockMovementCount = p.StockMovements?.Count ?? 0
             }));
         }
 
+        // Son silinen 10 ürünü getir
         [HttpGet("Last10Deleted")]
         public async Task<ActionResult<IEnumerable<object>>> GetLast10DeletedProducts()
         {
@@ -345,13 +338,14 @@ namespace InventoryApi.Controllers
                     d.DeletedAt,
                     d.Brand,
                     d.DeletedBy,
-                    d.CreatedBy // ✅ Ekleyen kullanıcı bilgisi de listelendi
+                    d.CreatedBy
                 })
                 .ToListAsync();
 
             return Ok(deleted);
         }
 
+        // Tüm ürünlerin kriitk stok seviyesini güncelle
         [HttpPut("UpdateAllCriticalStockLevel/{newLevel}")]
         public async Task<IActionResult> UpdateAllCriticalStockLevel(int newLevel)
         {
@@ -370,6 +364,7 @@ namespace InventoryApi.Controllers
             return Ok(new { message = $"Tüm ürünlerin kritik seviyesi {newLevel} olarak güncellendi." });
         }
 
+        // Herhangi bir ürünü getir
         [HttpGet("Any")]
         public async Task<ActionResult<object>> GetAnyProduct()
         {
@@ -390,6 +385,7 @@ namespace InventoryApi.Controllers
             });
         }
 
+        // Silinen ürünü geri yükle
         [HttpPost("Restore/{originalProductId}")]
         public async Task<IActionResult> RestoreProduct(int originalProductId)
         {
@@ -407,7 +403,7 @@ namespace InventoryApi.Controllers
             if (categoryId == 0)
                 return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu kategori artık mevcut değil.");
 
-            // Marka kontrolü (varsa)
+            // Marka kontrolü
             int? brandId = null;
             if (!string.IsNullOrEmpty(deleted.Brand))
             {
@@ -419,7 +415,7 @@ namespace InventoryApi.Controllers
                 if (brandId == 0)
                     return BadRequest("Kurtarılamadı: Ürünün bağlı olduğu marka artık mevcut değil.");
 
-                // brandId = 0 döndüyse null yapalım
+                // brandId = 0 döndüyse null yap
                 if (brandId == 0) brandId = null;
             }
 
@@ -432,7 +428,7 @@ namespace InventoryApi.Controllers
                 CategoryId = categoryId,
                 BrandId = brandId,
                 CriticalStockLevel = 10,
-                CreatedBy = deleted.CreatedBy // ✅ Ekleyen kişi korunuyor
+                CreatedBy = deleted.CreatedBy
             };
 
             _context.Product.Add(restoredProduct);
@@ -460,7 +456,7 @@ namespace InventoryApi.Controllers
 
             if (favorite == null)
             {
-                // ✅ Favori ekle
+                // Favori ekle
                 _context.ProductFavorites.Add(new ProductFavorite
                 {
                     ProductId = id,
@@ -472,7 +468,7 @@ namespace InventoryApi.Controllers
             }
             else
             {
-                // ✅ Favoriyi kaldır
+                // Favori kaldır
                 _context.ProductFavorites.Remove(favorite);
                 await _context.SaveChangesAsync();
 
@@ -480,8 +476,7 @@ namespace InventoryApi.Controllers
             }
         }
 
-
-
+        // Kullanıcının favorilerini temizle
         [HttpDelete("ClearFavorites")]
         public async Task<IActionResult> ClearFavorites([FromQuery] string userId)
         {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace InventoryApi.Models
@@ -6,10 +7,10 @@ namespace InventoryApi.Models
     public class StockMovement
     {
         [Key]
-        public int MovementId { get; set; }
+        public int MovementId { get; set; } // Primary Key
 
-        [Required]
-        public int ProductId { get; set; }
+        [ForeignKey("Product")]
+        public int ProductId { get; set; } // Foreign Key
 
         [Required]
         [RegularExpression("^(in|out)$", ErrorMessage = "MovementType sadece 'in' veya 'out' olabilir")]

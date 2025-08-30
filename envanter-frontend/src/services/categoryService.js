@@ -13,7 +13,7 @@ export const getAllCategories = async () => {
   }
 };
 
-// Kategori ekle (KÜÇÜK HARFLE "name" GÖNDER)
+// Kategori ekle
 export const addCategory = async (name) => {
   try {
     await axios.post(API_URL, { name });
@@ -38,7 +38,8 @@ export const renameCategory = async (id, newName) => {
   try {
     await axios.put(`${API_URL}/Rename/${id}`, { newName });
   } catch (error) {
-    console.error('Kategori adı değiştirilemedi:', error);
+    console.error('Kategori adi değiştirilemedi:', error);
     throw error;
   }
 };
+

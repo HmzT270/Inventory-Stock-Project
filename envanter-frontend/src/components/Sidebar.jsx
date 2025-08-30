@@ -68,7 +68,7 @@ export default function Sidebar({ children, role, username, onLogout }) {
         display: "flex",
         flexDirection: "column",
         bgcolor: theme.palette.background.default,
-        whiteSpace: "nowrap", // Scroll engelle
+        whiteSpace: "nowrap",
       }}
       role="presentation"
       onClick={isMobile ? () => setDrawerOpen(false) : undefined}

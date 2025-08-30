@@ -162,7 +162,7 @@ export default function DeletedProductsTable() {
               </Table>
             </TableContainer>
 
-            {/* Fade uyarı mesajı tablonun altında */}
+            {/* Ürün Kurtar Uyarı Mesajı */}
             <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
               <Fade in={showStatus} timeout={1500}>
                 <Alert

@@ -90,13 +90,13 @@ export default function ForgotPassword() {
       return;
     }
 
-    // ✅ Güvenlik sorusu kontrolü
+    // Güvenlik sorusu kontrolü
     if (users[userIndex].securityAnswer !== securityAnswer) {
       setMessage("❌ Güvenlik sorusu cevabı yanlış!");
       return;
     }
 
-    // ✅ Şifreyi güncelle
+    // Şifreyi güncelle
     users[userIndex].password = newPassword;
     localStorage.setItem("users", JSON.stringify(users));
 

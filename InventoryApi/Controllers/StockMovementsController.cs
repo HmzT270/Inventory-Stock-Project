@@ -80,10 +80,7 @@ namespace InventoryApi.Controllers
                 .Include(sm => sm.Product)
                 .ToListAsync();
 
-            if (movements == null || !movements.Any())
-            {
-                return Ok(new List<StockMovement>()); // ❗Boş liste dön
-            }
+            if (movements == null || !movements.Any()) return Ok(new List<StockMovement>()); // ❗Boş liste dön
 
             return Ok(movements);
         }

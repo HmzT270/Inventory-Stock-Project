@@ -1,32 +1,26 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-namespace InventoryApi.Models
-{
-    public class Product
-    {
-        public int ProductId { get; set; }
+namespace InventoryApi.Models {
+    public class Product {
+        [Key]
+        public int ProductId { get; set; } // Primary Key
 
-        [Required(ErrorMessage = "Ürün adı boş bırakılamaz")]
+        [Required(ErrorMessage = "Ürün adi boş birakilamaz")]
         public string Name { get; set; } = string.Empty;
 
-        [Range(0, int.MaxValue, ErrorMessage = "Stok miktarı negatif olamaz")]
+        [Range(0, int.MaxValue, ErrorMessage = "Stok miktari negatif olamaz")]
         public int Quantity { get; set; }
 
-        public int CategoryId { get; set; }
+        [ForeignKey("Category")]
+        public int CategoryId { get; set; } // Kategori Foreign Key
 
         public string? Description { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public int CriticalStockLevel { get; set; } = 10;
-
-        public int? BrandId { get; set; }  // Marka foreign key (nullable)
-
-        [ValidateNever]
-        public Brand? Brand { get; set; }  // Marka navigation (nullable)
 
         [ValidateNever]
         public Category Category { get; set; } = null!;
@@ -34,13 +28,12 @@ namespace InventoryApi.Models
         [ValidateNever]
         public List<StockMovement> StockMovements { get; set; } = new();
 
-        public string? CreatedBy { get; set; }
+         public int? BrandId { get; set; }  // Marka foreign key (nullable)
 
-        public bool IsFavorite { get; set; } = false;
+        [ValidateNever]
+        public Brand? Brand { get; set; }  // Marka navigation (nullable)
 
-        public Product()
-        {
-            CreatedAt = DateTime.Now;
-        }
+        public string? CreatedBy { get; set; } // Ürünü ekleyen kullanıcı
     }
 }
+

@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5184/api/Brand';
-const PRODUCT_API_URL = 'http://localhost:5184/api/Product';
 
 // Tüm markaları getir
 export const getAllBrands = async () => {

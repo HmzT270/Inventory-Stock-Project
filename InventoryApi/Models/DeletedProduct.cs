@@ -1,9 +1,5 @@
-﻿using System;
-
-namespace InventoryApi.Models
-{
-    public class DeletedProduct
-    {
+﻿namespace InventoryApi.Models {
+    public class DeletedProduct {
         public int DeletedProductId { get; set; }
 
         public string Name { get; set; } = string.Empty;
@@ -18,10 +14,11 @@ namespace InventoryApi.Models
 
         public string? CategoryName { get; set; }
 
-        public string? Brand { get; set; } // ✅ Marka bilgisi
+        public string? Brand { get; set; }
 
         public string? DeletedBy { get; set; }  // Silen kullanıcı
 
-        public string? CreatedBy { get; set; }  // ✅ Ekleyen kullanıcı (yeni)
+        public string? CreatedBy { get; set; }  // Ekleyen kullanıcı
     }
 }
+

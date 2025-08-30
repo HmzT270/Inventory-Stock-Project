@@ -1,4 +1,3 @@
-// components/ThemeContext.jsx
 import React, { createContext, useContext, useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -51,7 +50,6 @@ export const ThemeContextProvider = ({ children }) => {
             height: "100%",
             transition: "background-color 0.6s ease, color 0.6s ease",
           },
-          // Paper, Card, Box ve Grid için global geçiş
           ".MuiGrid-root, .MuiPaper-root, .MuiCard-root, .MuiBox-root": {
             transition: "background-color 0.6s ease, color 0.6s ease",
           },
@@ -97,7 +95,7 @@ export const ThemeContextProvider = ({ children }) => {
         <GlobalStyles
           styles={{
             ":root": {
-              colorScheme: darkMode ? "light dark" : "light", // 🎯 color-scheme buraya eklendi
+              colorScheme: darkMode ? "light dark" : "light",
             },
             // DataGrid başlık, iç satır ve hücreler için animasyon
             ".MuiDataGrid-columnHeaders, .MuiDataGrid-footerContainer, .MuiTableHead-root, .MuiTableRow-root, .MuiDataGrid-columnHeadersInner, .MuiDataGrid-columnHeader, .MuiDataGrid-cell, .MuiTableCell-root":

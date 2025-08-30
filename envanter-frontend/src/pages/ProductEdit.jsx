@@ -12,7 +12,7 @@ import {
 import {
   getAllProducts,
   updateProductDescription,
-  updateProductCategory as changeProductCategory,
+  changeProductCategory,
 } from "../services/productService";
 import { getAllCategories } from "../services/categoryService";
 

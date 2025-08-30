@@ -16,6 +16,11 @@ namespace InventoryApi.Controllers
             _context = context;
         }
 
+        public class BrandControllerDto
+        {
+            public string NewName { get; set; } = string.Empty;
+        }
+
         // Tüm markaları getir
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Brand>>> GetBrands()
@@ -58,14 +63,8 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
-        // Marka adı değiştir (Kategoriyle aynı mantıkta)
-        public class RenameBrandDto
-        {
-            public string NewName { get; set; } = string.Empty;
-        }
-
         [HttpPut("Rename/{id}")]
-        public async Task<IActionResult> RenameBrand(int id, [FromBody] RenameBrandDto dto)
+        public async Task<IActionResult> RenameBrand(int id, [FromBody] BrandControllerDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.NewName))
                 return BadRequest("Yeni marka adı boş olamaz.");

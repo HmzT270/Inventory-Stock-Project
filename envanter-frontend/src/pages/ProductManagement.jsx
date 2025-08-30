@@ -186,6 +186,7 @@ function ProductManagement() {
       }}
     >
       <Grid rowSpacing={3} container spacing={6} justifyContent="center">
+
         {/* Ürün Ekle Kutusu */}
         <Grid>
           <Paper

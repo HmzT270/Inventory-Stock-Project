@@ -12,7 +12,7 @@ export default function ChangePassword() {
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,20}$/;
 
-  // ✅ Şifre gücü hesaplama
+  // Şifre gücü hesaplama
   const calculatePasswordStrength = (password) => {
     let score = 0;
     if (password.length >= 6) score++;
@@ -64,7 +64,7 @@ export default function ChangePassword() {
     e.preventDefault();
 
     if (!username || !oldPassword || !newPassword || !securityAnswer) {
-      setStatus("❌ Tüm alanları doldurun!");
+      setStatus("Tüm alanlari doldurun!");
       return;
     }
 
@@ -72,26 +72,26 @@ export default function ChangePassword() {
     const user = users.find((u) => u.username === username);
 
     if (!user) {
-      setStatus("❌ Kullanıcı adı yanlış!");
+      setStatus("Kullanici adi yanliş!");
       return;
     }
 
     if (user.password !== oldPassword) {
-      setStatus("❌ Eski şifre yanlış!");
+      setStatus("Eski şifre yanliş!");
       return;
     }
 
     if (user.securityAnswer !== securityAnswer) {
-      setStatus("❌ Güvenlik sorusu cevabı yanlış!");
+      setStatus("Güvenlik sorusu cevabi yanliş!");
       return;
     }
 
     if (!passwordRegex.test(newPassword)) {
-      setStatus("❌ Yeni şifre kriterleri karşılanmıyor!");
+      setStatus("Yeni şifre kriterleri karşilanmiyor!");
       return;
     }
 
-    // ✅ Şifreyi güncelle
+    // Şifreyi güncelle
     user.password = newPassword;
     const updatedUsers = users.map((u) =>
       u.username === username ? user : u
@@ -99,7 +99,7 @@ export default function ChangePassword() {
     localStorage.setItem("users", JSON.stringify(updatedUsers));
 
     setStatus(
-      "✅ Şifre başarıyla değiştirildi! 1.5 sn sonra giriş sayfasına yönlendiriliyorsunuz..."
+      "Şifre başariyla değiştirildi! 1.5 sn sonra giriş sayfasina yönlendiriliyorsunuz..."
     );
 
     setTimeout(() => {
@@ -179,7 +179,7 @@ export default function ChangePassword() {
           autoComplete="new-password"
         />
 
-        {/* ✅ Animasyonlu Şifre Güç Çubuğu */}
+        {/* Animasyonlu Şifre Güç Çubuğu */}
         {newPassword && (
           <Box>
             <Box
@@ -217,7 +217,7 @@ export default function ChangePassword() {
           Şifreyi Değiştir
         </Button>
 
-        {/* ✅ Şifre Kuralı Yazısı Butonun Altında */}
+        {/* Şifre Kuralı Yazısı Butonun Altında */}
         <Typography
           variant="caption"
           sx={{

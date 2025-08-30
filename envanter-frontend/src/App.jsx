@@ -16,8 +16,7 @@ import DeletedProductsTable from "./pages/DeletedProductsTable";
 import LoginForm from "./pages/LoginForm";
 import RegisterForm from "./pages/RegisterForm";
 import ChangePassword from "./pages/ChangePassword";
-import ForgotPassword from "./pages/ForgotPassword"; // ✅ Şifremi Unuttum eklendi
-
+import ForgotPassword from "./pages/ForgotPassword";
 import { ThemeContextProvider, useThemeContext } from "./components/ThemeContext";
 
 function AppContent() {
@@ -25,7 +24,6 @@ function AppContent() {
   const [userRole, setUserRole] = useState(null);
   const [username, setUsername] = useState("");
   const [sessionError, setSessionError] = useState(false);
-
   const { darkMode, toggleTheme } = useThemeContext();
 
   useEffect(() => {
@@ -88,7 +86,7 @@ function AppContent() {
                 }}
                 onSwitchToRegister={() => (window.location.href = "/register")}
                 onSwitchToChangePassword={() => (window.location.href = "/change-password")}
-                onSwitchToForgotPassword={() => (window.location.href = "/forgot-password")} // ✅ Eklendi
+                onSwitchToForgotPassword={() => (window.location.href = "/forgot-password")} // Eklendi
               />
             )
           }
@@ -123,7 +121,7 @@ function AppContent() {
             loggedIn ? (
               <Navigate to="/" />
             ) : (
-              <ForgotPassword /> // ✅ Yeni eklenen sayfa
+              <ForgotPassword /> // Yeni eklenen sayfa
             )
           }
         />

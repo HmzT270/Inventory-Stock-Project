@@ -1,8 +1,11 @@
-﻿namespace InventoryApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace InventoryApi.Models
 {
     public class Category
     {
-        public int CategoryId { get; set; }
+        [Key]
+        public int CategoryId { get; set; }  // Primary Key
 
         public string Name { get; set; } = string.Empty;
 
