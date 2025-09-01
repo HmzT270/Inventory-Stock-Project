@@ -63,6 +63,7 @@ namespace InventoryApi.Controllers
             return NoContent();
         }
 
+        // Marka adı değiştir
         [HttpPut("Rename/{id}")]
         public async Task<IActionResult> RenameBrand(int id, [FromBody] BrandControllerDto dto)
         {

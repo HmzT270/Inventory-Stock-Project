@@ -66,14 +66,14 @@ to { background-color: rgba(255,59,59,0.96); }
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]); // Dizi!
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [filterType, setFilterType] = useState("all");
   const [criticalLevel, setCriticalLevel] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOption, setSortOption] = useState("serialnumber_asc");
-  const [showFavoritesIcon, setShowFavoritesIcon] = useState(false); // ⭐ Yıldız gösterimi
+  const [showFavoritesIcon, setShowFavoritesIcon] = useState(false); // Yıldız gösterimi
   const [favoriteStatus, setFavoriteStatus] = useState({
     success: null,
     message: "",
